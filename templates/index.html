@@ -9,15 +9,15 @@
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/4e/Chocolate_bar_%28plain%29.svg">
 
     <style>
-        /* Глобальные переменные для темной темы */
+        /* Глобальные переменные для благородной темной темы */
         :root {
-            --color-dark-brown: #362222; /* Очень темный, горький шоколад */
-            --color-medium-brown: #5d4037; /* Средний шоколад */
-            --color-light-brown: #8d6e63; /* Коричневый акцент */
-            --color-gold: #ffd700; /* Золотой акцент */
-            --color-text-light: #f5f5f5; /* Светлый текст */
-            --color-text-dark: #362222; /* Темный текст для светлых элементов */
-            --color-background: #1c1c1c; /* Темный фон */
+            --color-dark-primary: #1e1717; /* Глубокий, почти черный фон */
+            --color-dark-secondary: #3b2f2f; /* Благородный темный шоколад для блоков */
+            --color-bronze: #b8860b; /* Темная бронза/старое золото */
+            --color-gold-light: #ffd700; /* Яркое золото для акцентов (кнопки, лого) */
+            --color-text-light: #f0f0f0; /* Светлый текст */
+            --color-text-dark: #1e1717; /* Темный текст для светлых элементов */
+            --color-border: #5d4037; /* Граница-акцент */
         }
 
         /* Общие стили и сброс */
@@ -25,8 +25,8 @@
             font-family: sans-serif;
             margin: 0;
             padding: 0;
-            color: var(--color-text-light); /* Светлый текст по умолчанию */
-            background-color: var(--color-background); /* Темный фон */
+            color: var(--color-text-light);
+            background-color: var(--color-dark-primary); /* Глубокий темный фон */
             overflow-x: hidden;
             width: 100%;
         }
@@ -37,8 +37,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 50px;
-            background-color: var(--color-dark-brown); /* Темный фон шапки */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            background-color: var(--color-dark-primary); /* Тот же цвет, что и фон, но с тенью */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -47,12 +47,11 @@
         .logo {
             font-family: serif;
             font-size: 1.8em;
-            color: var(--color-gold); /* Золотой логотип */
+            color: var(--color-bronze); /* Логотип - темная бронза */
             font-weight: bold;
             text-decoration: none;
         }
 
-        /* ФИКС: Улучшенное отображение навигации */
         .header nav a {
             text-decoration: none;
             color: var(--color-text-light);
@@ -62,22 +61,21 @@
         }
 
         .header nav a:hover {
-            color: var(--color-gold);
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7); /* Эффект свечения */
+            color: var(--color-gold-light);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
         }
 
         /* Герой-секция */
         .hero {
-            /* Используем твое Hero-фото */
+            /* Твоя Hero-фото */
             background-image: url('https://i.ibb.co/bjbVQ1fc/new-aurana-hero.jpg');
-            background-attachment: fixed;
+            background-attachment: fixed; /* Эффект параллакса */
             background-position: center 35%;
             background-size: cover;
             min-height: 45vh;
             display: flex;
             align-items: center;
             text-align: center;
-            color: var(--color-text-light);
             position: relative;
             z-index: 1;
         }
@@ -89,31 +87,34 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.4); /* Более сильное затемнение */
+            background-color: rgba(0, 0, 0, 0.4);
             z-index: -1;
         }
 
         .hero h2 {
-            color: var(--color-gold); 
+            font-family: serif;
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: var(--color-gold-light); 
             text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
         }
 
         .hero-button {
             display: inline-block;
             padding: 12px 30px;
-            background-color: var(--color-medium-brown);
+            background-color: var(--color-bronze); /* Бронзовая кнопка */
             color: var(--color-text-light);
-            border: 2px solid var(--color-gold); /* Золотая обводка */
+            border: none;
             border-radius: 5px;
             font-weight: bold;
             transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-            box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Золотое свечение */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
         }
 
         .hero-button:hover {
-            background-color: var(--color-dark-brown);
+            background-color: #a07d09; /* Чуть темнее бронза */
             transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.8);
+            box-shadow: 0 6px 15px rgba(255, 215, 0, 0.3); /* Легкое свечение */
         }
 
         /* Общие секции */
@@ -121,111 +122,120 @@
             padding: 60px 50px;
             text-align: center;
         }
+        
+        /* ФИКС: Увеличение отступов для секций */
+        .section:not(.products-section) {
+            margin: 60px 0; 
+        }
 
         .section h3 {
             font-family: serif;
             font-size: 2.2em;
-            color: var(--color-gold); /* Золотые заголовки */
+            color: var(--color-bronze); 
             margin-bottom: 40px;
         }
         
         /* Стиль для информационных секций (О нас, Доставка, Заказ) */
         .info-section {
-            background-color: var(--color-dark-brown); /* Темный фон для блоков */
-            border: 1px solid var(--color-medium-brown);
+            background-color: var(--color-dark-secondary); /* Благородный темный цвет */
+            border: 1px solid var(--color-border);
             border-radius: 10px; 
             padding: 40px;
-            margin: 40px auto;
+            margin: 40px auto; /* ФИКС: Промежутки между блоками */
             max-width: 800px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
             color: var(--color-text-light);
         }
 
         /* Секция продуктов (Каталог) */
         .products-section {
-            background-color: var(--color-background); /* Фон каталога */
+            background-color: var(--color-dark-primary);
         }
 
+        /* Карточки продуктов */
         .product-card {
-            background-color: var(--color-dark-brown); /* Темный фон карточки */
-            border: 1px solid var(--color-medium-brown);
+            background-color: var(--color-dark-secondary); /* Темный фон карточки */
+            border: 1px solid var(--color-border);
             box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3); /* Золотое свечение при наведении */
+            box-shadow: 0 8px 25px rgba(184, 134, 11, 0.5); /* Бронзовое свечение при наведении */
+        }
+
+        /* ФИКС: Размер фото - фиксированная высота (квадратный вид) */
+        .product-card img {
+            width: 100%;
+            height: 300px; /* Увеличили для лучшего вида, можно изменить на 250px, если много */
+            object-fit: cover; /* Ключ к квадратному/равномерному виду */
         }
 
         .product-info h4 {
-            color: var(--color-gold); /* Золотые названия продуктов */
-        }
-
-        .product-info p {
-            color: var(--color-text-light);
+            color: var(--color-bronze); /* Бронзовые названия продуктов */
         }
 
         .price {
-            color: var(--color-gold); /* Золотая цена */
+            color: var(--color-gold-light); /* Яркое золото для цены */
+            font-size: 1.5em; /* Чуть увеличим, чтобы цена была видна */
         }
 
-        /* ФИКС: Кнопка "Заказать" на всю ширину, золотая, с эффектом */
+        /* Кнопка "Заказать" */
         .buy-button {
             display: block;
             width: 100%;
-            padding: 10px;
-            background-color: var(--color-gold); /* Золотая кнопка */
+            padding: 12px;
+            background-color: var(--color-gold-light); /* Яркое золото для лучшей читаемости */
             color: var(--color-text-dark); /* Темный текст на золотом */
-            border: none;
             border-radius: 5px;
             font-weight: bold;
-            cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
         .buy-button:hover {
-            background-color: #e5c100; /* Чуть темнее золото */
+            background-color: #e5c100; 
             transform: translateY(-1px);
         }
         
         /* Футер */
         .footer {
-            background-color: var(--color-dark-brown);
+            background-color: var(--color-dark-secondary);
             color: #ccc;
             padding: 40px 50px;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 -4px 8px rgba(0,0,0,0.5);
         }
 
         .footer a {
-            color: var(--color-gold);
+            color: var(--color-bronze);
         }
 
-        /* Персонализация */
         .customer-code {
-            color: var(--color-gold);
+            color: var(--color-bronze);
         }
 
         /* Адаптивность для мобильных */
         @media (max-width: 768px) {
-            /* ФИКС: Корректное отображение меню на мобильных (убрана прокрутка) */
             .header {
                 padding: 10px 15px; 
             }
-            .header nav {
-                 /* Ключевой фикс: делаем меню горизонтальным для мобильных, убираем сдвиг */
-                display: flex;
-                justify-content: flex-end;
-            }
             .header nav a {
-                font-size: 0.8em; 
+                font-size: 0.9em; 
                 margin-left: 10px; 
             }
-
+            .hero { 
+                min-height: 40vh; 
+                background-attachment: scroll; /* ФИКС: Убираем параллакс на мобильных */
+            }
             .product-card img {
-                /* ФИКС: Убеждаемся, что изображение занимает всю ширину и не ломает контейнер */
-                max-width: 100%; 
+                height: 250px; /* Чуть меньше на мобильных */
+            }
+            .section {
+                 padding: 40px 20px;
+            }
+            .info-section {
+                 padding: 30px 20px;
             }
         }
     </style>
@@ -238,8 +248,7 @@
             <a href="#catalog">Каталог</a>
             <a href="#about">О нас</a>
             <a href="#delivery">Доставка</a>
-            <a href="#contact">Заказать</a>
-        </nav>
+            </nav>
     </header>
 
     <section class="hero" id="top">
