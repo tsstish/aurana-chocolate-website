@@ -7,7 +7,7 @@ import os
 # !!! ВАЖНО: Замените "http://mysite.com" на реальный адрес, 
 # который будет у твоего сайта (мы его настроим позже, 
 # но для печати уже нужна заглушка).
-BASE_URL = "http://auranachocolate.com/" 
+BASE_URL = "https://aurana-chocolate-website.vercel.app/" 
 
 # Папка для сохранения QR-кодов
 OUTPUT_DIR = "qrcodes_for_print" 
