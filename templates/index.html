@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurana Chocolate – Элитный шоколад ручной работы</title>
-    <meta name="description" content="Лимитированная коллекция элитного шоколада ручной работы. Достойный подарок, созданный с любовью на натуральном какао-масле.">
-    <meta name="keywords" content="шоколад, ручная работа, элитный шоколад, темный шоколад, лимитированная коллекция, Aurana">
+    <title>Aurana Chocolate – Премиальный шоколад ручной работы</title>
+    <meta name="description" content="Лимитированная коллекция премиального шоколада ручной работы. Создан с натуральным какао-маслом, уникальными добавками и любовью. Идеальный подарок.">
+    <meta name="keywords" content="шоколад ручной работы, премиум шоколад, элитный шоколад, авторский шоколад, Aurana, купить шоколад Москва">
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/4e/Chocolate_bar_%28plain%29.svg">
 
     <style>
@@ -16,7 +16,7 @@
             padding: 0;
             color: #4b4b4b;
             background-color: #ffffff;
-            overflow-x: hidden; /* ФИКС: Убираем горизонтальный скроллинг на мобильных */
+            overflow-x: hidden;
             width: 100%;
         }
 
@@ -25,7 +25,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 50px; /* ФИКС: Уменьшили высоту шапки */
+            padding: 10px 50px; 
             background-color: #ffffff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             position: sticky;
@@ -36,7 +36,7 @@
         .logo {
             font-family: serif;
             font-size: 1.8em;
-            color: #8b4513; /* Коричневый цвет для логотипа */
+            color: #8b4513; 
             font-weight: bold;
             text-decoration: none;
         }
@@ -50,20 +50,20 @@
         }
 
         .header nav a:hover {
-            color: #a0522d; /* Светло-коричневый при наведении */
+            color: #a0522d;
         }
 
-        /* Герой-секция (Уменьшенная высота, полное покрытие фото) */
+        /* Герой-секция */
         .hero {
-            background-image: url('https://i.ibb.co/bjbVQ1fc/new-aurana-hero.jpg'); /* ФИКС: Новая Hero-фото */
-            background-attachment: fixed; /* Эффект параллакса */
-            background-position: center 35%; /* Фокусируем немного выше центра */
-            background-size: cover; /* КЛЮЧ: Растягиваем, убираем замощенность */
-            min-height: 45vh; /* Уменьшенная высота */
+            background-image: url('https://i.ibb.co/bjbVQ1fc/new-aurana-hero.jpg');
+            background-attachment: fixed;
+            background-position: center 35%;
+            background-size: cover;
+            min-height: 45vh;
             display: flex;
             align-items: center;
             text-align: center;
-            color: #ffffff; /* Светлый текст поверх темного фона */
+            color: #ffffff;
             position: relative;
             z-index: 1;
         }
@@ -75,7 +75,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.3); /* Легкое затемнение для читаемости текста */
+            background-color: rgba(0, 0, 0, 0.3);
             z-index: -1;
         }
 
@@ -89,7 +89,7 @@
             font-family: serif;
             font-size: 3em;
             margin-bottom: 10px;
-            color: #ffd700; /* Золотой цвет для заголовка */
+            color: #ffd700;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
         }
 
@@ -103,7 +103,7 @@
         .hero-button {
             display: inline-block;
             padding: 12px 30px;
-            background-color: #a0522d; /* Светло-коричневый цвет кнопки */
+            background-color: #a0522d;
             color: #ffffff;
             text-decoration: none;
             border-radius: 5px;
@@ -113,7 +113,7 @@
         }
 
         .hero-button:hover {
-            background-color: #8b4513; /* Более темный при наведении */
+            background-color: #8b4513;
             transform: translateY(-2px);
         }
 
@@ -128,6 +128,16 @@
             font-size: 2.2em;
             color: #8b4513;
             margin-bottom: 40px;
+        }
+        
+        /* Стиль для информационных секций (О нас, Доставка, Заказ) */
+        .info-section {
+            background-color: #f9f5f0; 
+            border-radius: 10px; 
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         /* Секция продуктов (Каталог) */
@@ -193,7 +203,7 @@
             display: block;
             width: 100%;
             padding: 10px;
-            background-color: #ffd700; /* Золотой цвет кнопки */
+            background-color: #ffd700;
             color: #4b4b4b;
             text-decoration: none;
             border: none;
@@ -205,13 +215,6 @@
 
         .buy-button:hover {
             background-color: #e5c100;
-        }
-
-        /* Секция о нас */
-        .about-us-section {
-            background-color: #ffffff;
-            max-width: 800px;
-            margin: 0 auto;
         }
         
         /* Футер */
@@ -244,22 +247,22 @@
             margin-top: 5px;
         }
 
-        /* Адаптивность для мобильных: отключаем параллакс и фиксируем высоту */
+        /* Адаптивность для мобильных */
         @media (max-width: 768px) {
-            /* 1. Навигация */
+            /* Навигация */
             .header {
-                padding: 10px 15px; /* ФИКС: Уменьшаем отступы по бокам */
+                padding: 10px 15px; 
             }
             .header nav a {
-                font-size: 0.8em; /* ФИКС: Уменьшаем шрифт меню */
-                margin-left: 10px; /* ФИКС: Уменьшаем расстояние между пунктами меню */
+                font-size: 0.8em; 
+                margin-left: 10px; 
             }
 
-            /* 2. Hero-секция */
+            /* Hero-секция */
             .hero { 
-                min-height: 40vh; /* Чуть меньше высота */
-                background-attachment: scroll; /* ФИКС: Отключаем параллакс на мобильных */
-                background-position: center center; /* Фокусируем по центру */
+                min-height: 40vh; 
+                background-attachment: scroll; 
+                background-position: center center; 
             }
             .hero h2 { font-size: 2em; }
             .products-section { padding: 30px 0; }
@@ -289,49 +292,50 @@
     <section class="section products-section" id="catalog">
         <h3>Лимитированная коллекция</h3>
         <div class="product-grid">
+            
             <div class="product-card">
-                <img src="https://i.ibb.co/Xz9F31b/product-1.jpg" alt="Черный шоколад с ягодами">
+                <img src="https://ibb.co/4wLXVVT8" alt="ТВОЕ ОПИСАНИЕ КАРТИНКИ 1">
                 <div class="product-info">
-                    <h4>Плитка "Горький бархат"</h4>
-                    <p>Насыщенный темный шоколад (80% какао) с цельной сублимированной малиной и ежевикой.</p>
+                    <h4>Шоколад с клубникой</h4>
+                    <p>Плитка молочного шоколада с сублимированной клубникой.</p>
                     <div class="price">1500 ₽</div>
                     <a href="#contact" class="buy-button">Заказать</a>
                 </div>
             </div>
             
             <div class="product-card">
-                <img src="https://i.ibb.co/6P6X2Xk/product-2.jpg" alt="Белый шоколад с орехами">
+                <img src="https://ibb.co/Sz2RgrR" alt="ТВОЕ ОПИСАНИЕ КАРТИНКИ 2">
                 <div class="product-info">
-                    <h4>Плитка "Белое золото"</h4>
-                    <p>Нежнейший белый шоколад с фисташками, кедровыми орехами и щепоткой гималайской соли.</p>
-                    <div class="price">1650 ₽</div>
+                    <h4>Шоколад с мороженным</h4>
+                    <p>Плитка молочного шоколада с мороженным пломбир - крем-брюле.</p>
+                    <div class="price">1600 ₽</div>
                     <a href="#contact" class="buy-button">Заказать</a>
                 </div>
             </div>
 
             <div class="product-card">
-                <img src="https://i.ibb.co/Q8Q7c7m/product-3.jpg" alt="Молочный шоколад с цитрусами">
+                <img src="https://ibb.co/Kc22yG0S" alt="ТВОЕ ОПИСАНИЕ КАРТИНКИ 3">
                 <div class="product-info">
-                    <h4>Плитка "Солнечный микс"</h4>
-                    <p>Классический молочный шоколад (45% какао) с сушеными ломтиками апельсина и лимона.</p>
-                    <div class="price">1400 ₽</div>
+                    <h4>Шоколад с манго</h4>
+                    <p>Плитка молочного шоколада с манго.</p>
+                    <div class="price">1500 ₽</div>
                     <a href="#contact" class="buy-button">Заказать</a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="section about-us-section" id="about">
+    <section class="section info-section" id="about">
         <h3>Наша философия</h3>
         <p>Мы верим, что шоколад — это не просто десерт, а произведение искусства. Каждая плитка Aurana создается вручную, с использованием только натурального какао-масла и лучших ингредиентов со всего мира. Мы не используем искусственные ароматизаторы, чтобы сохранить подлинный и глубокий вкус какао. <br>Это лимитированный продукт для тех, кто ценит качество.</p>
     </section>
     
-    <section class="section about-us-section" id="delivery">
+    <section class="section info-section" id="delivery">
         <h3>Доставка</h3>
         <p>Информация о доставке будет добавлена после запуска. <br>На данный момент детали обсуждаются индивидуально при заказе.</p>
     </section>
 
-    <section class="section about-us-section" id="contact">
+    <section class="section info-section" id="contact">
         <h3>Заказать</h3>
         <p>Информация о контактах для заказа будет добавлена после запуска. <br>На данный момент детали обсуждаются индивидуально через личные сообщения.</p>
     </section>
