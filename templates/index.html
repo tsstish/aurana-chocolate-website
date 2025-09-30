@@ -127,7 +127,12 @@
 /* Общие секции */
 .section {
     padding: 60px 50px;
-    text-align: center;
+    /* text-align: center; */ /* Удаляем, чтобы избежать конфликта */
+    
+    /* ГАРАНТИРОВАННОЕ ЦЕНТРИРОВАНИЕ дочерних блоков */
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
 }
         
         .section:not(.products-section) {
@@ -143,17 +148,17 @@
         
         /* Стиль для информационных секций (О нас, Доставка, Заказ) */
         .info-section {
-            background-color: var(--color-dark-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: 10px; 
-            padding: 40px;
-            /* ФИКС: Гарантированное центрирование */
-            margin: 40px auto 80px auto; 
-            max-width: 800px;
-            box-shadow: 0 0 15px rgba(184, 134, 11, 0.15), 0 8px 20px rgba(0,0,0,0.5);
-            color: var(--color-text-light);
-            text-align: center; 
-        }
+    background-color: var(--color-dark-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 10px; 
+    padding: 40px;
+    /* ФИКС: Убираем auto. Теперь центрирует родительский flexbox. */
+    margin: 40px 0 80px 0; 
+    max-width: 800px;
+    box-shadow: 0 0 15px rgba(184, 134, 11, 0.15), 0 8px 20px rgba(0,0,0,0.5);
+    color: var(--color-text-light);
+    text-align: center; 
+}
         
         /* ФИКС: Убедимся, что форма внутри секции центрирована */
        .order-form-container {

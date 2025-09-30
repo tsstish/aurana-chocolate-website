@@ -86,14 +86,8 @@
         {% if orders %}
             {% for order in orders %}
             <div class="order-card">
-                <div class="order-header">
-    <span>Заказ #{{ loop.index }} (от 
-        {% if order.order_date %}
-            {{ order.order_date.strftime('%d.%m.%Y %H:%M') }}
-        {% else %}
-            Дата неизвестна
-        {% endif %}
-    )</span>
+            <div class="order-header">
+    <span>Заказ #{{ loop.index }} (от {{ order.order_date }})</span>
     <span class="order-status">Статус: {{ order.status }}</span>
 </div>
                 <ul class="item-list">

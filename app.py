@@ -4,7 +4,7 @@ import json
 import random
 import os
 import shutil 
-from datetime import datetime # ДОБАВЛЕНО: для работы с датами
+from datetime import datetime # Для работы с датами
 
 app = Flask(__name__)
 # Указываем имя файла, а не путь
@@ -35,7 +35,6 @@ def get_db():
 # =========================================================================
 
 def get_products():
-    # Список товаров остается без изменений
     return [
         {"id": "A01", "name": "Плитка молочного шоколада с сублимированной клубникой", "price": 1500},
         {"id": "A02", "name": "Плитка молочного шоколада с мороженным пломбир - крем-брюле", "price": 1600},
@@ -43,7 +42,6 @@ def get_products():
     ]
 
 def generate_unique_code(conn):
-    # Логика генерации кода остается без изменений
     while True:
         number = random.randint(1000, 9999) 
         code = f"A{number:04d}"
@@ -52,24 +50,27 @@ def generate_unique_code(conn):
             return code
             
 # =========================================================================
-# НОВАЯ/ИЗМЕНЕННАЯ: Функция для безопасного парсинга дат SQLite
+# ИЗМЕНЕННАЯ ФУНКЦИЯ: Парсит и форматирует дату в безопасную строку
 # =========================================================================
-def parse_date_robustly(date_string):
-    """Пытается парсить дату в разных форматах SQLite (с микросекундами и без)."""
+def format_date_for_display(date_string):
+    """Пытается парсить дату в разных форматах SQLite и возвращает готовую строку."""
     if not date_string:
-        return None
-    # 1. Сначала пытаемся парсить с микросекундами (%f)
+        return "Дата неизвестна"
+        
+    # 1. Попытка с микросекундами
     try:
-        return datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f')
+        dt_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f')
+        return dt_obj.strftime('%d.%m.%Y %H:%M')
     except ValueError:
         pass
-    # 2. Если не сработало, пробуем без микросекунд
+    # 2. Попытка без микросекунд
     try:
-        return datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        dt_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+        return dt_obj.strftime('%d.%m.%Y %H:%M')
     except ValueError:
         pass
         
-    return None # Если все попытки неудачны
+    return "Ошибка формата даты" # Финальный запасной вариант
 
 
 @app.route('/')
@@ -131,23 +132,15 @@ def profile():
         except json.JSONDecodeError:
             items = [{"name": "Ошибка данных", "qty": 1, "price": 0}]
 
-        # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ: Надежное получение объекта даты
-        order_date_obj = parse_date_robustly(row['order_date'])
-
         orders.append({
-            'order_date': order_date_obj,
+            # Теперь это ГОТОВАЯ СТРОКА, а не объект datetime
+            'order_date': format_date_for_display(row['order_date']),
             'status': row['status'],
             'items': items
         })
 
     # Форматируем дату регистрации клиента
-    reg_date = "Дата неизвестна"
-    if customer and customer['registration_date']:
-        # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ: Надежное получение объекта даты
-        reg_date_obj = parse_date_robustly(customer['registration_date'])
-        
-        if reg_date_obj:
-            reg_date = reg_date_obj.strftime('%d.%m.%Y')
+    reg_date = format_date_for_display(customer['registration_date']) if customer and customer['registration_date'] else "Дата неизвестна"
 
     return render_template('profile.html',
                            code=customer_code,
