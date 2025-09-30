@@ -87,9 +87,15 @@
             {% for order in orders %}
             <div class="order-card">
                 <div class="order-header">
-                    <span>Заказ #{{ loop.index }} (от {{ order.order_date.strftime('%d.%m.%Y %H:%M') }})</span>
-                    <span class="order-status">Статус: {{ order.status }}</span>
-                </div>
+    <span>Заказ #{{ loop.index }} (от 
+        {% if order.order_date %}
+            {{ order.order_date.strftime('%d.%m.%Y %H:%M') }}
+        {% else %}
+            Дата неизвестна
+        {% endif %}
+    )</span>
+    <span class="order-status">Статус: {{ order.status }}</span>
+</div>
                 <ul class="item-list">
                     {% for item in order.items %}
                     <li>{{ item.name }} &mdash; {{ item.qty }} шт. ({{ item.price }} ₽ за шт.)</li>
