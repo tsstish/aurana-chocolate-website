@@ -79,8 +79,7 @@
     <div class="container">
         <h1>Личный кабинет</h1>
         <p style="text-align: center;">Ваш код лояльности: <span class="highlight" style="font-size: 1.2em;">{{ code }}</span></p>
-        <p style="text-align: center; margin-bottom: 40px;">Мы рады, что вы с нами с <span class="highlight">{{ registration_date }}</span>. Всего заказов: <span class="highlight">{{ orders | length }}</span></p>
-
+       <p style="text-align: center; margin-bottom: 40px;">Мы рады, что вы с нами с <span class="highlight">{{ registration_date }}</span>. Всего заказов: <span class="highlight">{{ orders | length }}</span></p>
         <h2 style="color: var(--color-bronze); font-size: 1.5em; margin-bottom: 20px;">История заказов</h2>
 
         {% if orders %}
