@@ -132,13 +132,12 @@
             margin-bottom: 40px;
         }
         
-        /* Стиль для информационных секций (О нас, Доставка, Регистрация) */
+        /* Стиль для информационных секций (О нас, Доставка, Заказ) */
         .info-section {
             background-color: var(--color-dark-secondary);
             border: 1px solid var(--color-border);
             border-radius: 10px; 
             padding: 40px;
-            /* ФИКС: Увеличенный маржин снизу для отступа от футера */
             margin: 40px auto 80px auto; 
             max-width: 800px;
             box-shadow: 0 0 15px rgba(184, 134, 11, 0.15), 0 8px 20px rgba(0,0,0,0.5);
@@ -220,66 +219,74 @@
             background-color: #e5c100; 
             transform: translateY(-1px);
         }
-        
-        /* ФОРМА РЕГИСТРАЦИИ (Новые стили) */
-        .registration-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 400px;
-            margin: 0 auto;
-            padding-top: 20px;
-        }
 
-        .registration-form input[type="text"] {
+        /* Стили для формы заказа */
+        .order-form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .order-input {
+            width: 100%;
             padding: 15px;
+            margin-bottom: 20px;
             border: 1px solid var(--color-border);
             border-radius: 5px;
             background-color: var(--color-dark-primary);
             color: var(--color-text-light);
             font-size: 1.1em;
-            transition: border-color 0.3s;
-        }
-        
-        .registration-form input[type="text"]:focus {
-            outline: none;
-            border-color: var(--color-gold-light);
         }
 
-        .registration-button {
+        .order-submit-button {
+            width: 100%;
             padding: 15px;
-            background-color: var(--color-gold-light);
-            color: var(--color-text-dark);
+            background-color: var(--color-bronze);
+            color: var(--color-text-light);
             border: none;
             border-radius: 5px;
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1.2em;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
         }
-        
-        .registration-button:hover {
-            background-color: #e5c100;
-            transform: translateY(-1px);
+
+        .order-submit-button:hover {
+            background-color: #a07d09;
+            transform: translateY(-2px);
         }
-        
-        .account-info {
+
+        .product-checkboxes {
             text-align: left;
-            padding-top: 20px;
-            line-height: 1.8;
-            border-top: 1px solid var(--color-border);
-            margin-top: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--color-border);
+            padding: 15px;
+            border-radius: 5px;
         }
 
-        .account-info p {
-            margin: 5px 0;
+        .product-checkboxes label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dotted #4d3f3f;
         }
 
-        .account-info .highlight {
+        .product-checkboxes label:last-child {
+            border-bottom: none;
+        }
+        
+        .product-checkboxes input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .highlight {
             color: var(--color-gold-light);
             font-weight: bold;
         }
-        
+
+
         /* Футер */
         .footer {
             background-color: var(--color-dark-secondary);
@@ -298,32 +305,6 @@
 
         /* Адаптивность для мобильных */
         @media (max-width: 768px) {
-            .header {
-                padding: 10px 15px; 
-            }
-            .header nav {
-                display: flex;
-                flex-wrap: wrap; 
-                justify-content: flex-end;
-            }
-            .header nav a {
-                font-size: 0.8em; 
-                margin-left: 10px; 
-                margin-top: 5px; 
-            }
-            .hero { 
-                min-height: 40vh; 
-                background-attachment: scroll; 
-            }
-            .product-card img {
-                height: 250px; 
-            }
-            .section {
-                 padding: 40px 20px;
-            }
-            .info-section {
-                 padding: 30px 20px;
-            }
             .buy-button {
                 width: 90%; 
             }
@@ -338,7 +319,7 @@
             <a href="#catalog">Каталог</a>
             <a href="#about">О нас</a>
             <a href="#delivery">Доставка</a>
-            <a href="#account">Аккаунт</a> 
+            <a href="#order">Заказ</a> 
         </nav>
     </header>
 
@@ -360,7 +341,7 @@
                     <h4>Плитка молочного шоколада с сублимированной клубникой</h4>
                     <p>Настоящая клубника в лучшем молочном шоколаде. Идеальное сочетание сладости и кислинки, которое тает во рту.</p>
                     <div class="price">1500 ₽</div>
-                    <a href="#account" class="buy-button">Заказать</a>
+                    <a href="#order" class="buy-button">Заказать</a>
                 </div>
             </div>
             
@@ -370,7 +351,7 @@
                     <h4>Плитка молочного шоколада с мороженным пломбир - крем-брюле</h4>
                     <p>Эксклюзивное сочетание, имитирующее вкус нежного пломбира и карамелизированного крем-брюле. Наслаждение для гурманов.</p>
                     <div class="price">1600 ₽</div>
-                    <a href="#account" class="buy-button">Заказать</a>
+                    <a href="#order" class="buy-button">Заказать</a>
                 </div>
             </div>
 
@@ -380,7 +361,7 @@
                     <h4>Плитка молочного шоколада с манго</h4>
                     <p>Тропический взрыв! Сочный, сладкий манго в молочном шоколаде. Идеально для тех, кто ищет необычные вкусовые решения.</p>
                     <div class="price">1500 ₽</div>
-                    <a href="#account" class="buy-button">Заказать</a>
+                    <a href="#order" class="buy-button">Заказать</a>
                 </div>
             </div>
         </div>
@@ -396,42 +377,49 @@
         <p>Информация о доставке будет добавлена после запуска. <br>На данный момент детали обсуждаются индивидуально при заказе.</p>
     </section>
 
-    <section class="section info-section" id="account">
-        <h3>Личный кабинет и Заказ</h3>
-
-        {% if customer_code %}
-            {% if is_registered and name %}
-                <p>Добро пожаловать обратно, <span class="highlight">{{ name }}</span>!</p>
-                
-                <div class="account-info">
-                    <p>Ваш персональный код лояльности: <span class="highlight">{{ customer_code }}</span></p>
-                    <p>Статус: <span class="highlight">Участник программы</span></p>
-                    <p>Бонусные баллы: <span class="highlight">0</span> (скоро здесь будет история)</p>
-                    <p>Ваши заказы: <span class="highlight">0</span></p>
-                </div>
-                
-                <p style="margin-top: 20px;">Для заказа свяжитесь с нами, указав свой <span class="highlight">код клиента</span> и выбранный шоколад.</p>
-                <p>— <a href="#" class="hero-button" style="text-decoration:none; margin-top:15px; width:auto;">Связаться для оформления заказа</a> —</p>
-
+    <section class="section info-section" id="order">
+        <h3>Оформить заказ</h3>
+        
+        <div class="order-form-container">
+            {% if customer_code %}
+                <p>
+                    <span style="font-size: 1.1em;">
+                        Ваш код лояльности: <span class="highlight">{{ customer_code }}</span>. 
+                        {% if name %} Мы рады, <span class="highlight">{{ name }}</span>! {% endif %}
+                    </span>
+                    <br>
+                    Пожалуйста, подтвердите свои данные и выберите товар.
+                </p>
+                <input type="hidden" name="customer_code" value="{{ customer_code }}"> 
             {% else %}
-                <p>Мы рады видеть вас в программе лояльности Aurana!</p>
-                <p>Ваш персональный код: <span class="highlight">{{ customer_code }}</span></p>
-                <p>Пожалуйста, представьтесь, чтобы мы могли обращаться к вам по имени и начать собирать ваши бонусы:</p>
-                
-                <form class="registration-form" method="POST" action="{{ url_for('register') }}">
-                    <input type="text" name="name" placeholder="Ваше Имя" required>
-                    <button type="submit" class="registration-button">Зарегистрироваться и заказать</button>
-                </form>
-                <p style="margin-top: 20px;">(Это также служит формой "Заказа", пока не интегрирована полная корзина).</p>
-
+                <p>
+                    Пожалуйста, введите свое имя и контакт для оформления заказа. 
+                    <br>После первого заказа вы получите **персональный код лояльности!**
+                </p>
             {% endif %}
-        {% else %}
-            <p>Вы еще не являетесь участником программы лояльности. <span class="highlight">Ваш код клиента: AXXXXX</span></p>
-            <p style="margin-top: 20px;">Для оформления заказа или получения своего персонального кода, свяжитесь с нами:</p>
-            <p>— <a href="#" class="hero-button" style="text-decoration:none; margin-top:15px; width:auto;">Связаться для оформления заказа</a> —</p>
-            <p style="margin-top: 15px;">(При первом заказе вы получите свою персональную визитку с QR-кодом).</p>
-        {% endif %}
 
+            <form method="POST" action="{{ url_for('place_order') }}">
+                <input type="text" name="name" placeholder="Ваше Имя (обязательно)" value="{{ name if name else '' }}" class="order-input" required>
+                <input type="text" name="contact" placeholder="Ваш контакт (Telegram/WhatsApp/Email)" class="order-input" required>
+                
+                <h4 style="color: var(--color-bronze); margin-top: 30px; margin-bottom: 15px;">Выберите товар:</h4>
+
+                <div class="product-checkboxes">
+                    {% for product in products %}
+                        <label>
+                            <span>{{ product.name }}</span>
+                            <input type="checkbox" name="product_{{ product.id }}" value="1">
+                            <span class="highlight">{{ product.price }} ₽</span>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="order-submit-button">Отправить заказ</button>
+                <p style="margin-top: 15px; font-size: 0.9em; color: #aaa;">
+                    Мы свяжемся с вами в течение 30 минут для подтверждения деталей и доставки.
+                </p>
+            </form>
+        </div>
     </section>
 
 
