@@ -116,14 +116,15 @@ def place_order():
     
     return resp
 
-# Маршрут для страницы успешного заказа (success.html - не меняется)
+# Маршрут для страницы успешного заказа (success.html)
 @app.route('/order_success')
 def order_success():
     code = request.args.get('code', 'AXXXXX')
-    # Добавляем очистку корзины в куках
-    resp = make_response(render_template('success.html', code=code))
-    resp.set_cookie('aurana_cart', '', expires=0) # Очищаем корзину в LocalStorage (через куки)
-    return resp
+    
+    # ВОТ ОНО ИСПРАВЛЕНИЕ: Мы убираем команду очистки куки на сервере, 
+    # так как очистка LocalStorage происходит на стороне клиента (в success.html).
+    # Теперь просто возвращаем страницу успеха
+    return render_template('success.html', code=code)
 
 
 # Маршрут для обработки сканирования QR-кода (установка куки)
