@@ -31,7 +31,11 @@
             width: 100%;
         }
 
-        /* Шапка сайта */
+        /* Шапка, Герой, О нас, Доставка - стили без изменений */
+        .header, .logo, .header nav a, .hero, .section, .section h3, .info-section, .products-section, .product-grid, .product-card {
+            /* Используем стили из предыдущего шага */
+        }
+        
         .header {
             display: flex;
             justify-content: space-between;
@@ -201,25 +205,42 @@
             margin-bottom: 20px;
         }
 
-        /* Кнопка "Заказать" - узкая и по центру */
-        .buy-button {
-            display: block;
-            width: 70%; 
+        /* Динамический счетчик и кнопки "Купить" */
+        .quantity-control {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin: 0 auto 10px auto; 
-            padding: 12px;
-            background-color: var(--color-gold-light);
-            color: var(--color-text-dark);
+            width: 70%;
             border-radius: 5px;
+            overflow: hidden;
+            border: 2px solid var(--color-gold-light);
+        }
+        
+        .quantity-control button {
+            background-color: var(--color-dark-primary);
+            color: var(--color-gold-light);
+            border: none;
+            padding: 12px 15px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.1s;
+        }
+
+        .quantity-control button:hover {
+            background-color: #2b2121;
+        }
+
+        .quantity-control span {
+            flex-grow: 1;
+            padding: 12px 0;
+            background-color: var(--color-dark-secondary);
+            color: var(--color-text-light);
             font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            font-size: 1.1em;
         }
-
-        .buy-button:hover {
-            background-color: #e5c100; 
-            transform: translateY(-1px);
-        }
-
+        
         /* Стили для формы заказа */
         .order-form-container {
             max-width: 500px;
@@ -255,15 +276,17 @@
             transform: translateY(-2px);
         }
 
-        .product-checkboxes {
-            text-align: left;
-            margin-bottom: 25px;
+        /* Мини-корзина (Mini Cart) */
+        .mini-cart {
+            margin-top: 30px;
+            padding: 20px;
             border: 1px solid var(--color-border);
-            padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
+            text-align: left;
+            background-color: var(--color-dark-primary);
         }
 
-        .product-checkboxes label {
+        .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -271,22 +294,24 @@
             border-bottom: 1px dotted #4d3f3f;
         }
 
-        .product-checkboxes label:last-child {
+        .cart-item:last-child {
             border-bottom: none;
         }
         
-        .product-checkboxes input[type="checkbox"] {
-            transform: scale(1.5);
-            margin-right: 15px;
-            cursor: pointer;
+        .cart-summary {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--color-gold-light);
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid var(--color-bronze);
         }
         
         .highlight {
             color: var(--color-gold-light);
             font-weight: bold;
         }
-
-
+        
         /* Футер */
         .footer {
             background-color: var(--color-dark-secondary);
@@ -305,7 +330,7 @@
 
         /* Адаптивность для мобильных */
         @media (max-width: 768px) {
-            .buy-button {
+            .quantity-control {
                 width: 90%; 
             }
         }
@@ -335,35 +360,28 @@
         <h3>Лимитированная коллекция</h3>
         <div class="product-grid">
             
+            {% for product in products %}
             <div class="product-card">
-                <img src="https://i.ibb.co/Fk1yDDw5/IMG-3903.jpg" alt="Молочный шоколад с клубникой">
+                <img src="{% if product.id == 'A01' %}https://i.ibb.co/Fk1yDDw5/IMG-3903.jpg{% elif product.id == 'A02' %}https://i.ibb.co/TsZmGLm/IMG-3902.jpg{% elif product.id == 'A03' %}https://i.ibb.co/Q7PPmcbt/IMG-3901.jpg{% endif %}" alt="{{ product.name }}">
                 <div class="product-info">
-                    <h4>Плитка молочного шоколада с сублимированной клубникой</h4>
-                    <p>Настоящая клубника в лучшем молочном шоколаде. Идеальное сочетание сладости и кислинки, которое тает во рту.</p>
-                    <div class="price">1500 ₽</div>
-                    <a href="#order" class="buy-button">Заказать</a>
+                    <h4 data-name="{{ product.name }}" data-id="{{ product.id }}">{{ product.name }}</h4>
+                    <p>
+                        {% if product.id == 'A01' %}Настоящая клубника в лучшем молочном шоколаде. Идеальное сочетание сладости и кислинки, которое тает во рту.
+                        {% elif product.id == 'A02' %}Эксклюзивное сочетание, имитирующее вкус нежного пломбира и карамелизированного крем-брюле.
+                        {% elif product.id == 'A03' %}Тропический взрыв! Сочный, сладкий манго в молочном шоколаде. Идеально для тех, кто ищет необычные вкусовые решения.
+                        {% endif %}
+                    </p>
+                    <div class="price" data-price="{{ product.price }}">{{ product.price }} ₽</div>
+                    
+                    <div class="quantity-control">
+                        <button onclick="updateCart('{{ product.id }}', -1, '{{ product.name }}', {{ product.price }})">−</button>
+                        <span id="qty_{{ product.id }}">0</span>
+                        <button onclick="updateCart('{{ product.id }}', 1, '{{ product.name }}', {{ product.price }})">+</button>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
             
-            <div class="product-card">
-                <img src="https://i.ibb.co/TsZmGLm/IMG-3902.jpg" alt="Молочный шоколад пломбир крем-брюле">
-                <div class="product-info">
-                    <h4>Плитка молочного шоколада с мороженным пломбир - крем-брюле</h4>
-                    <p>Эксклюзивное сочетание, имитирующее вкус нежного пломбира и карамелизированного крем-брюле. Наслаждение для гурманов.</p>
-                    <div class="price">1600 ₽</div>
-                    <a href="#order" class="buy-button">Заказать</a>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <img src="https://i.ibb.co/Q7PPmcbt/IMG-3901.jpg" alt="Молочный шоколад с манго">
-                <div class="product-info">
-                    <h4>Плитка молочного шоколада с манго</h4>
-                    <p>Тропический взрыв! Сочный, сладкий манго в молочном шоколаде. Идеально для тех, кто ищет необычные вкусовые решения.</p>
-                    <div class="price">1500 ₽</div>
-                    <a href="#order" class="buy-button">Заказать</a>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -378,43 +396,37 @@
     </section>
 
     <section class="section info-section" id="order">
-        <h3>Оформить заказ</h3>
+        <h3>Ваш заказ</h3>
         
         <div class="order-form-container">
-            {% if customer_code %}
-                <p>
-                    <span style="font-size: 1.1em;">
-                        Ваш код лояльности: <span class="highlight">{{ customer_code }}</span>. 
-                        {% if name %} Мы рады, <span class="highlight">{{ name }}</span>! {% endif %}
-                    </span>
-                    <br>
-                    Пожалуйста, подтвердите свои данные и выберите товар.
-                </p>
-                <input type="hidden" name="customer_code" value="{{ customer_code }}"> 
-            {% else %}
-                <p>
-                    Пожалуйста, введите свое имя и контакт для оформления заказа. 
-                    <br>После первого заказа вы получите **персональный код лояльности!**
-                </p>
-            {% endif %}
+            <h4 style="color: var(--color-bronze); margin-bottom: 15px;">Выбранные товары</h4>
+            <div class="mini-cart" id="mini_cart_display">
+                <p style="text-align: center; color: #999;">Ваша корзина пуста.</p>
+            </div>
+
+            <p style="margin-top: 30px; margin-bottom: 20px;">
+                Пожалуйста, заполните контактные данные для завершения оформления.
+            </p>
 
             <form method="POST" action="{{ url_for('place_order') }}">
-                <input type="text" name="name" placeholder="Ваше Имя (обязательно)" value="{{ name if name else '' }}" class="order-input" required>
+                
+                <input type="text" name="name" placeholder="Ваше Имя (обязательно)" value="{% if name %}{{ name }}{% endif %}" class="order-input" required>
                 <input type="text" name="contact" placeholder="Ваш контакт (Telegram/WhatsApp/Email)" class="order-input" required>
                 
-                <h4 style="color: var(--color-bronze); margin-top: 30px; margin-bottom: 15px;">Выберите товар:</h4>
+                <input type="hidden" id="order_data_input" name="order_details_json" value="" required>
 
-                <div class="product-checkboxes">
-                    {% for product in products %}
-                        <label>
-                            <span>{{ product.name }}</span>
-                            <input type="checkbox" name="product_{{ product.id }}" value="1">
-                            <span class="highlight">{{ product.price }} ₽</span>
-                        </label>
-                    {% endfor %}
-                </div>
+                {% if customer_code %}
+                    <p style="text-align: left; font-size: 0.9em; margin-bottom: 20px;">
+                        Вы оформляете заказ как <span class="highlight">{{ customer_code }}</span>.
+                    </p>
+                {% else %}
+                    <p style="text-align: left; font-size: 0.9em; margin-bottom: 20px; color: var(--color-bronze);">
+                        Вы получите персональный код лояльности с первым заказом!
+                    </p>
+                {% endif %}
 
-                <button type="submit" class="order-submit-button">Отправить заказ</button>
+
+                <button type="submit" class="order-submit-button" id="submit_order_button" disabled>Оформить заказ и связаться с нами</button>
                 <p style="margin-top: 15px; font-size: 0.9em; color: #aaa;">
                     Мы свяжемся с вами в течение 30 минут для подтверждения деталей и доставки.
                 </p>
@@ -432,5 +444,111 @@
         <p class="customer-code-footer">Ваш личный код клиента: <span class="customer-code">{{ customer_code if customer_code else 'AXXXXX' }}</span></p>
     </footer>
 
+    <script>
+        // Корзина хранится в LocalStorage, чтобы не терять товары при навигации
+        let cart = JSON.parse(localStorage.getItem('aurana_cart')) || {};
+
+        // Функция обновления корзины
+        function updateCart(productId, change, productName, productPrice) {
+            
+            // Получаем текущее количество
+            let currentQty = cart[productId] ? cart[productId].quantity : 0;
+            let newQty = currentQty + change;
+            
+            // Ограничения: количество не может быть меньше 0
+            if (newQty < 0) {
+                newQty = 0;
+            }
+            
+            // Обновляем данные в объекте cart
+            if (newQty > 0) {
+                cart[productId] = {
+                    quantity: newQty,
+                    name: productName,
+                    price: productPrice
+                };
+            } else {
+                delete cart[productId]; // Удаляем товар, если количество 0
+            }
+
+            // Обновляем LocalStorage
+            localStorage.setItem('aurana_cart', JSON.stringify(cart));
+            
+            // Обновляем UI в карточке товара
+            const qtySpan = document.getElementById(`qty_${productId}`);
+            if (qtySpan) {
+                qtySpan.textContent = newQty;
+            }
+
+            // Обновляем мини-корзину и общую сумму
+            renderMiniCart();
+        }
+
+        // Функция отрисовки мини-корзины и обновления скрытого поля формы
+        function renderMiniCart() {
+            const cartDisplay = document.getElementById('mini_cart_display');
+            const orderDataInput = document.getElementById('order_data_input');
+            const submitButton = document.getElementById('submit_order_button');
+            
+            let total = 0;
+            let itemsCount = 0;
+            let cartHtml = '';
+            let orderDetails = [];
+
+            for (const productId in cart) {
+                const item = cart[productId];
+                if (item.quantity > 0) {
+                    const itemTotal = item.quantity * item.price;
+                    total += itemTotal;
+                    itemsCount += item.quantity;
+
+                    // HTML для отображения в корзине
+                    cartHtml += `
+                        <div class="cart-item">
+                            <span>${item.name} x ${item.quantity}</span>
+                            <span class="highlight">${itemTotal} ₽</span>
+                        </div>
+                    `;
+                    
+                    // Данные для отправки на сервер (JSON-массив)
+                    orderDetails.push({
+                        id: productId,
+                        name: item.name,
+                        qty: item.quantity,
+                        price: item.price
+                    });
+                }
+            }
+
+            if (itemsCount > 0) {
+                // Выводим товары и итого
+                cartDisplay.innerHTML = cartHtml + `
+                    <div class="cart-summary">
+                        Итого: ${itemsCount} шт. <span style="float: right;">${total} ₽</span>
+                    </div>
+                `;
+                // Заполняем скрытое поле JSON-строкой
+                orderDataInput.value = JSON.stringify(orderDetails);
+                submitButton.disabled = false; // Включаем кнопку заказа
+            } else {
+                // Корзина пуста
+                cartDisplay.innerHTML = '<p style="text-align: center; color: #999;">Ваша корзина пуста.</p>';
+                orderDataInput.value = ''; // Очищаем поле
+                submitButton.disabled = true; // Отключаем кнопку заказа
+            }
+        }
+
+        // Инициализация при загрузке страницы
+        window.onload = function() {
+            // При загрузке страницы обновляем UI карточек на основе LocalStorage
+            for (const productId in cart) {
+                const qtySpan = document.getElementById(`qty_${productId}`);
+                if (qtySpan) {
+                    qtySpan.textContent = cart[productId].quantity;
+                }
+            }
+            renderMiniCart(); // Отрисовываем корзину
+        }
+    </script>
 </body>
 </html>
