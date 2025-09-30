@@ -31,11 +31,7 @@
             width: 100%;
         }
 
-        /* Шапка, Герой, О нас, Доставка - стили без изменений */
-        .header, .logo, .header nav a, .hero, .section, .section h3, .info-section, .products-section, .product-grid, .product-card {
-            /* Используем стили из предыдущего шага */
-        }
-        
+        /* Шапка сайта */
         .header {
             display: flex;
             justify-content: space-between;
@@ -54,6 +50,7 @@
             color: var(--color-bronze); 
             font-weight: bold;
             text-decoration: none;
+            flex-shrink: 0;
         }
 
         .header nav a {
@@ -71,16 +68,19 @@
 
         /* Герой-секция */
         .hero {
-            background-image: url('https://i.ibb.co/V0wGJVKf/IMG-3904.jpg');
+            /* URL для Hero-секции */
+            background-image: url('https://i.ibb.co/bjbVQ1fc/new-aurana-hero.jpg');
             background-attachment: fixed; 
             background-position: center 35%;
             background-size: cover;
             min-height: 45vh;
             display: flex;
             align-items: center;
+            justify-content: center;
             text-align: center;
             position: relative;
             z-index: 1;
+            padding: 20px;
         }
 
         .hero::before {
@@ -93,6 +93,11 @@
             background-color: rgba(0, 0, 0, 0.4);
             z-index: -1;
         }
+        
+        .hero-content {
+            max-width: 600px;
+        }
+
 
         .hero h2 {
             font-family: serif;
@@ -119,11 +124,11 @@
             box-shadow: 0 6px 15px rgba(255, 215, 0, 0.3);
         }
 
-/* Общие секции */
-.section {
-    padding: 60px 50px;
-    text-align: center; /* ЭТО ДОЛЖНО БЫТЬ ТУТ */
-}
+        /* Общие секции */
+        .section {
+            padding: 60px 50px;
+            text-align: center;
+        }
         
         .section:not(.products-section) {
             margin: 60px 0; 
@@ -136,18 +141,25 @@
             margin-bottom: 40px;
         }
         
-/* Стиль для информационных секций (О нас, Доставка, Заказ) */
-.info-section {
-    background-color: var(--color-dark-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: 10px; 
-    padding: 40px;
-    /* ИСПРАВЛЕНИЕ: Автоматические отступы слева и справа центрируют блок */
-    margin: 40px auto 80px auto; 
-    max-width: 800px;
-    box-shadow: 0 0 15px rgba(184, 134, 11, 0.15), 0 8px 20px rgba(0,0,0,0.5);
-    color: var(--color-text-light);
-}
+        /* Стиль для информационных секций (О нас, Доставка, Заказ) */
+        .info-section {
+            background-color: var(--color-dark-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: 10px; 
+            padding: 40px;
+            /* ФИКС: Гарантированное центрирование */
+            margin: 40px auto 80px auto; 
+            max-width: 800px;
+            box-shadow: 0 0 15px rgba(184, 134, 11, 0.15), 0 8px 20px rgba(0,0,0,0.5);
+            color: var(--color-text-light);
+            text-align: center; 
+        }
+        
+        /* ФИКС: Убедимся, что форма внутри секции центрирована */
+        .order-form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
 
         /* Секция продуктов (Каталог) */
         .products-section {
@@ -243,11 +255,6 @@
         }
         
         /* Стили для формы заказа */
-        .order-form-container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        
         .order-input {
             width: 100%;
             padding: 15px;
@@ -331,8 +338,25 @@
 
         /* Адаптивность для мобильных */
         @media (max-width: 768px) {
+            .header {
+                /* ФИКС НАВИГАЦИИ НА МОБИЛЬНОМ: Уменьшаем отступы и размер шрифта */
+                padding: 10px 20px;
+            }
+            .header nav a {
+                margin-left: 10px;
+                font-size: 0.9em;
+            }
+            /* ФИКС НАВИГАЦИИ НА МОБИЛЬНОМ: Убираем Flexbox, чтобы ссылки не налазели друг на друга */
+            .header nav {
+                display: flex;
+                flex-wrap: wrap; /* Позволяем ссылкам переноситься */
+                justify-content: flex-end;
+            }
             .quantity-control {
                 width: 90%; 
+            }
+            .section {
+                padding: 40px 20px;
             }
         }
     </style>
@@ -412,7 +436,7 @@
             <form method="POST" action="{{ url_for('place_order') }}">
                 
                 <input type="text" name="name" placeholder="Ваше Имя (обязательно)" value="{% if name %}{{ name }}{% endif %}" class="order-input" required>
-                <input type="text" name="contact" placeholder="Ваш контакт (Telegram/WhatsApp/Email)" class="order-input" required>
+                <input type="text" name="contact" placeholder="Ваш контакт (Telegram/WhatsApp/Email)" value="" class="order-input" required>
                 
                 <input type="hidden" id="order_data_input" name="order_details_json" value="" required>
 
