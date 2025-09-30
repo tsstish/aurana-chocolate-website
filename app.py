@@ -4,7 +4,7 @@ import json
 import random
 import os
 import shutil 
-from datetime import datetime # Для работы с датами
+from datetime import datetime
 
 app = Flask(__name__)
 # Указываем имя файла, а не путь
@@ -50,7 +50,7 @@ def generate_unique_code(conn):
             return code
             
 # =========================================================================
-# ИЗМЕНЕННАЯ ФУНКЦИЯ: Парсит и форматирует дату в безопасную строку
+# ФУНКЦИЯ ФОРМАТИРОВАНИЯ ДАТЫ (РАБОТАЕТ НА СЕРВЕРЕ И ВОЗВРАЩАЕТ СТРОКУ)
 # =========================================================================
 def format_date_for_display(date_string):
     """Пытается парсить дату в разных форматах SQLite и возвращает готовую строку."""
@@ -70,7 +70,7 @@ def format_date_for_display(date_string):
     except ValueError:
         pass
         
-    return "Ошибка формата даты" # Финальный запасной вариант
+    return "Ошибка формата даты"
 
 
 @app.route('/')
@@ -103,7 +103,7 @@ def index():
                            is_registered=is_registered,
                            products=get_products())
 
-# МАРШРУТ: Личный кабинет (ИСПОЛЬЗУЕТ НОВУЮ ФУНКЦИЮ ПАРСИНГА)
+# МАРШРУТ: Личный кабинет (ИСПОЛЬЗУЕТ БЕЗОПАСНОЕ ФОРМАТИРОВАНИЕ ДАТЫ)
 @app.route('/profile')
 def profile():
     customer_code = request.cookies.get('customer_code')
@@ -121,96 +121,4 @@ def profile():
     order_rows = conn.execute(
         'SELECT order_details, order_date, status FROM orders WHERE customer_code = ? ORDER BY order_date DESC', 
         (customer_code,)
-    ).fetchall()
-    
-    conn.close()
-    
-    orders = []
-    for row in order_rows:
-        try:
-            items = json.loads(row['order_details'])
-        except json.JSONDecodeError:
-            items = [{"name": "Ошибка данных", "qty": 1, "price": 0}]
-
-        orders.append({
-            # Теперь это ГОТОВАЯ СТРОКА, а не объект datetime
-            'order_date': format_date_for_display(row['order_date']),
-            'status': row['status'],
-            'items': items
-        })
-
-    # Форматируем дату регистрации клиента
-    reg_date = format_date_for_display(customer['registration_date']) if customer and customer['registration_date'] else "Дата неизвестна"
-
-    return render_template('profile.html',
-                           code=customer_code,
-                           registration_date=reg_date,
-                           orders=orders)
-
-
-@app.route('/place_order', methods=['POST'])
-def place_order():
-    customer_code = request.cookies.get('customer_code')
-    name = request.form.get('name')
-    contact = request.form.get('contact')
-    order_details_json = request.form.get('order_details_json') 
-    
-    if not name or not contact or not order_details_json:
-        return redirect(url_for('index')) 
-
-    conn = get_db()
-    
-    if not customer_code:
-        customer_code = generate_unique_code(conn)
-        
-        conn.execute(
-            'INSERT INTO customers (code, name, contact, registered, registration_date, first_visit) VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-            (customer_code, name, contact)
-        )
-    else:
-        conn.execute(
-            'UPDATE customers SET name = ?, contact = ?, registered = 1, last_visit = CURRENT_TIMESTAMP WHERE code = ?',
-            (name, contact, customer_code)
-        )
-
-    conn.execute(
-        'INSERT INTO orders (customer_code, order_details, status) VALUES (?, ?, ?)',
-        (customer_code, order_details_json, 'Новый')
-    )
-    conn.commit()
-    conn.close()
-    
-    resp = make_response(redirect(url_for('order_success', code=customer_code)))
-    resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
-    
-    return resp
-
-@app.route('/order_success')
-def order_success():
-    code = request.args.get('code', 'AXXXXX')
-    return render_template('success.html', code=code)
-
-
-@app.route('/qr/<customer_code>')
-def qr_entry(customer_code):
-    conn = get_db()
-    
-    exists = conn.execute('SELECT code FROM customers WHERE code = ?', (customer_code,)).fetchone()
-    
-    if exists:
-        resp = make_response(redirect(url_for('index')))
-        resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
-        
-        conn.execute(
-             'UPDATE customers SET first_visit = COALESCE(first_visit, CURRENT_TIMESTAMP), last_visit = CURRENT_TIMESTAMP WHERE code = ?', 
-             (customer_code,)
-        )
-        conn.commit()
-        conn.close()
-        return resp
-    else:
-        conn.close()
-        return redirect(url_for('index'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    ).

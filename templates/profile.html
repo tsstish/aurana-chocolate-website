@@ -3,106 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет – Aurana Chocolate</title>
+    <title>Личный кабинет - Aurana</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=6"> 
     <style>
         :root {
-            --color-dark-primary: #1e1717; 
-            --color-dark-secondary: #3b2f2f; 
-            --color-bronze: #b8860b; 
-            --color-gold-light: #ffd700; 
-            --color-text-light: #f0f0f0; 
+            --color-dark-primary: #1e1717;
+            --color-dark-secondary: #3b2f2f;
+            --color-bronze: #b8860b;
+            --color-gold-light: #ffd700;
+            --color-text-light: #f0f0f0;
+            --color-border: #4a3c3c;
         }
+
         body {
             font-family: sans-serif;
             background-color: var(--color-dark-primary);
             color: var(--color-text-light);
-            text-align: center;
-            padding: 50px;
+            line-height: 1.6;
+            padding-top: 80px;
         }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(30, 23, 23, 0.95);
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-size: 1.8em;
+            color: var(--color-gold-light);
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .header nav a {
+            color: var(--color-text-light);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 1em;
+        }
+        
         .container {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
             background-color: var(--color-dark-secondary);
             border-radius: 10px;
-            padding: 40px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            text-align: left; /* Внутри контейнера выравнивание по левому краю */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
+        
         h1 {
             color: var(--color-gold-light);
-            font-size: 2em;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
+        
         .highlight {
             color: var(--color-bronze);
             font-weight: bold;
         }
+
+        .order-history {
+            margin-top: 30px;
+        }
+
         .order-card {
             border: 1px solid var(--color-border);
-            border-radius: 5px;
             padding: 15px;
             margin-bottom: 20px;
-            background-color: #2b2121;
+            border-radius: 8px;
+            background-color: var(--color-dark-primary);
         }
+
         .order-header {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid #4a3c3c;
-            padding-bottom: 5px;
             margin-bottom: 10px;
-        }
-        .order-status {
+            font-size: 1.1em;
             color: var(--color-gold-light);
+        }
+        
+        .order-header span {
+            color: var(--color-text-light);
+        }
+
+        .order-status {
+            color: var(--color-bronze);
             font-weight: bold;
         }
-        .item-list {
-            font-size: 0.9em;
-            padding-left: 20px;
+
+        .order-details ul {
+            list-style: none;
+            padding: 0;
         }
-        .item-list li {
-            margin-bottom: 5px;
+
+        .order-details li {
+            border-bottom: 1px dashed var(--color-border);
+            padding: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            color: var(--color-text-dim);
         }
-        .back-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 12px 30px;
-            background-color: var(--color-bronze);
-            color: var(--color-text-light);
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
+        
+        .order-details li:last-child {
+            border-bottom: none;
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                padding: 15px 20px;
+            }
+            .container {
+                margin: 20px;
+                padding: 15px;
+            }
         }
     </style>
 </head>
+
 <body>
+    <header class="header">
+        <a href="{{ url_for('index') }}" class="logo">AURANA</a>
+        <nav>
+            <a href="{{ url_for('index') }}#catalog">На сайт</a>
+        </nav>
+    </header>
+
     <div class="container">
-        <h1>Личный кабинет</h1>
-        <p style="text-align: center;">Ваш код лояльности: <span class="highlight" style="font-size: 1.2em;">{{ code }}</span></p>
-       <p style="text-align: center; margin-bottom: 40px;">Мы рады, что вы с нами с <span class="highlight">{{ registration_date }}</span>. Всего заказов: <span class="highlight">{{ orders | length }}</span></p>
-        <h2 style="color: var(--color-bronze); font-size: 1.5em; margin-bottom: 20px;">История заказов</h2>
-
-        {% if orders %}
-            {% for order in orders %}
-            <div class="order-card">
-           <div class="order-header">
-    <span>Заказ #{{ loop.index }} (от {{ order.order_date }})</span>
-    <span class="order-status">Статус: {{ order.status }}</span>
-</div>
-                <ul class="item-list">
-                    {% for item in order.items %}
-                    <li>{{ item.name }} &mdash; {{ item.qty }} шт. ({{ item.price }} ₽ за шт.)</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p style="text-align: center; color: #999;">У вас пока нет оформленных заказов.</p>
-        {% endif %}
-
-        <p style="text-align: center;">
-            <a href="/" class="back-button">Вернуться на главную</a>
+        <h1>Личный Кабинет</h1>
+        <p style="text-align: center; margin-bottom: 40px;">
+            Ваш код клиента: <span class="highlight">{{ code }}</span>.
+            Мы рады, что вы с нами с <span class="highlight">{{ registration_date }}</span>. 
+            Всего заказов: <span class="highlight">{{ orders | length }}</span>.
         </p>
+
+        <div class="order-history">
+            <h2>История заказов</h2>
+            
+            {% if orders %}
+                {% for order in orders %}
+                <div class="order-card">
+                    <div class="order-header">
+                        <span>Заказ #{{ loop.index }} (от {{ order.order_date }})</span>
+                        <span class="order-status">Статус: {{ order.status }}</span>
+                    </div>
+                    <div class="order-details">
+                        <ul>
+                            {% for item in order.items %}
+                                <li>
+                                    <span>{{ item.name }}</span>
+                                    <span>{{ item.qty }} шт. x {{ item.price }} ₽</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: var(--color-text-dim);">У вас пока нет оформленных заказов.</p>
+            {% endif %}
+
+        </div>
     </div>
 </body>
 </html>
