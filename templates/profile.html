@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет – Aurana Chocolate</title>
+    <style>
+        :root {
+            --color-dark-primary: #1e1717; 
+            --color-dark-secondary: #3b2f2f; 
+            --color-bronze: #b8860b; 
+            --color-gold-light: #ffd700; 
+            --color-text-light: #f0f0f0; 
+        }
+        body {
+            font-family: sans-serif;
+            background-color: var(--color-dark-primary);
+            color: var(--color-text-light);
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--color-dark-secondary);
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            text-align: left; /* Внутри контейнера выравнивание по левому краю */
+        }
+        h1 {
+            color: var(--color-gold-light);
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .highlight {
+            color: var(--color-bronze);
+            font-weight: bold;
+        }
+        .order-card {
+            border: 1px solid var(--color-border);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #2b2121;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #4a3c3c;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .order-status {
+            color: var(--color-gold-light);
+            font-weight: bold;
+        }
+        .item-list {
+            font-size: 0.9em;
+            padding-left: 20px;
+        }
+        .item-list li {
+            margin-bottom: 5px;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            background-color: var(--color-bronze);
+            color: var(--color-text-light);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Личный кабинет</h1>
+        <p style="text-align: center;">Ваш код лояльности: <span class="highlight" style="font-size: 1.2em;">{{ code }}</span></p>
+        <p style="text-align: center; margin-bottom: 40px;">Мы рады, что вы с нами с <span class="highlight">{{ registration_date }}</span>. Всего заказов: <span class="highlight">{{ orders | length }}</span></p>
+
+        <h2 style="color: var(--color-bronze); font-size: 1.5em; margin-bottom: 20px;">История заказов</h2>
+
+        {% if orders %}
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <span>Заказ #{{ loop.index }} (от {{ order.order_date.strftime('%d.%m.%Y %H:%M') }})</span>
+                    <span class="order-status">Статус: {{ order.status }}</span>
+                </div>
+                <ul class="item-list">
+                    {% for item in order.items %}
+                    <li>{{ item.name }} &mdash; {{ item.qty }} шт. ({{ item.price }} ₽ за шт.)</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: #999;">У вас пока нет оформленных заказов.</p>
+        {% endif %}
+
+        <p style="text-align: center;">
+            <a href="/" class="back-button">Вернуться на главную</a>
+        </p>
+    </div>
+</body>
+</html>

@@ -3,7 +3,8 @@ from flask import Flask, render_template, request, redirect, url_for, make_respo
 import json
 import random
 import os
-import shutil # Для работы с файлами
+import shutil 
+from datetime import datetime # ДОБАВЛЕНО: для работы с датами
 
 app = Flask(__name__)
 # Указываем имя файла, а не путь
@@ -17,22 +18,16 @@ DATABASE = os.path.join('/tmp', DATABASE_FILE)
 def ensure_db_exists():
     if not os.path.exists(DATABASE):
         # Если файл не существует в /tmp, копируем его из корневой папки.
-        # Это гарантирует, что Vercel может записывать в него.
         if os.path.exists(DATABASE_FILE):
             shutil.copyfile(DATABASE_FILE, DATABASE)
             print(f"База данных скопирована в {DATABASE}")
         else:
-            # Если даже в корневой папке нет, создаем его (это должно было 
-            # быть сделано скриптом setup_database.py)
             print("ВНИМАНИЕ: База данных не найдена. Создание новой.")
             conn = sqlite3.connect(DATABASE)
             conn.close()
-            # Здесь можно было бы добавить логику создания таблиц,
-            # но мы полагаемся на setup_database.py
 
 def get_db():
     """Устанавливает соединение с базой данных в /tmp."""
-    # ПЕРЕД тем, как подключиться, убедимся, что файл на месте
     ensure_db_exists() 
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
@@ -59,7 +54,6 @@ def generate_unique_code(conn):
 
 @app.route('/')
 def index():
-    # ... (логика index остается без изменений) ...
     customer_code = request.cookies.get('customer_code')
     name = None
     is_registered = False
@@ -87,6 +81,59 @@ def index():
                            name=name,
                            is_registered=is_registered,
                            products=get_products())
+
+# НОВЫЙ МАРШРУТ: Личный кабинет
+@app.route('/profile')
+def profile():
+    customer_code = request.cookies.get('customer_code')
+    
+    if not customer_code:
+        # Если нет кода, отправляем на главную
+        return redirect(url_for('index'))
+    
+    conn = get_db()
+    
+    # Получаем данные клиента
+    customer = conn.execute(
+        'SELECT name, registration_date FROM customers WHERE code = ?', 
+        (customer_code,)
+    ).fetchone()
+
+    # Получаем все заказы клиента
+    order_rows = conn.execute(
+        'SELECT order_details, order_date, status FROM orders WHERE customer_code = ? ORDER BY order_date DESC', 
+        (customer_code,)
+    ).fetchall()
+    
+    conn.close()
+    
+    orders = []
+    for row in order_rows:
+        try:
+            # Парсим JSON-строку обратно в Python-объект (список товаров)
+            items = json.loads(row['order_details'])
+        except json.JSONDecodeError:
+            # Обработка ошибки, если JSON-данные заказа повреждены
+            items = [{"name": "Ошибка данных", "qty": 1, "price": 0}]
+
+        orders.append({
+            # Форматируем дату для красивого отображения
+            'order_date': datetime.strptime(row['order_date'], '%Y-%m-%d %H:%M:%S'), 
+            'status': row['status'],
+            'items': items
+        })
+
+    # Форматируем дату регистрации клиента
+    if customer and customer['registration_date']:
+        reg_date = datetime.strptime(customer['registration_date'], '%Y-%m-%d %H:%M:%S').strftime('%d.%m.%Y')
+    else:
+        reg_date = "Дата неизвестна"
+
+    return render_template('profile.html',
+                           code=customer_code,
+                           registration_date=reg_date,
+                           orders=orders)
+
 
 @app.route('/place_order', methods=['POST'])
 def place_order():
@@ -120,6 +167,8 @@ def place_order():
     )
     conn.commit()
     conn.close()
+    
+    # Здесь можно было бы добавить вызов send_order_email, но ты просила пока остановиться
     
     resp = make_response(redirect(url_for('order_success', code=customer_code)))
     resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
