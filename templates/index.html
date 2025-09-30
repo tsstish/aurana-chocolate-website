@@ -9,13 +9,24 @@
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/4/4e/Chocolate_bar_%28plain%29.svg">
 
     <style>
+        /* Глобальные переменные для темной темы */
+        :root {
+            --color-dark-brown: #362222; /* Очень темный, горький шоколад */
+            --color-medium-brown: #5d4037; /* Средний шоколад */
+            --color-light-brown: #8d6e63; /* Коричневый акцент */
+            --color-gold: #ffd700; /* Золотой акцент */
+            --color-text-light: #f5f5f5; /* Светлый текст */
+            --color-text-dark: #362222; /* Темный текст для светлых элементов */
+            --color-background: #1c1c1c; /* Темный фон */
+        }
+
         /* Общие стили и сброс */
         body {
             font-family: sans-serif;
             margin: 0;
             padding: 0;
-            color: #4b4b4b;
-            background-color: #ffffff;
+            color: var(--color-text-light); /* Светлый текст по умолчанию */
+            background-color: var(--color-background); /* Темный фон */
             overflow-x: hidden;
             width: 100%;
         }
@@ -25,9 +36,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 50px; 
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 10px 50px;
+            background-color: var(--color-dark-brown); /* Темный фон шапки */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -36,25 +47,28 @@
         .logo {
             font-family: serif;
             font-size: 1.8em;
-            color: #8b4513; 
+            color: var(--color-gold); /* Золотой логотип */
             font-weight: bold;
             text-decoration: none;
         }
 
+        /* ФИКС: Улучшенное отображение навигации */
         .header nav a {
             text-decoration: none;
-            color: #4b4b4b;
+            color: var(--color-text-light);
             margin-left: 25px;
             font-size: 1em;
-            transition: color 0.3s;
+            transition: color 0.3s, text-shadow 0.3s;
         }
 
         .header nav a:hover {
-            color: #a0522d;
+            color: var(--color-gold);
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7); /* Эффект свечения */
         }
 
         /* Герой-секция */
         .hero {
+            /* Используем твое Hero-фото */
             background-image: url('https://i.ibb.co/bjbVQ1fc/new-aurana-hero.jpg');
             background-attachment: fixed;
             background-position: center 35%;
@@ -63,7 +77,7 @@
             display: flex;
             align-items: center;
             text-align: center;
-            color: #ffffff;
+            color: var(--color-text-light);
             position: relative;
             z-index: 1;
         }
@@ -75,46 +89,31 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.4); /* Более сильное затемнение */
             z-index: -1;
         }
 
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
         .hero h2 {
-            font-family: serif;
-            font-size: 3em;
-            margin-bottom: 10px;
-            color: #ffd700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-        }
-
-        .hero p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-            color: #f0f0f0;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            color: var(--color-gold); 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
         }
 
         .hero-button {
             display: inline-block;
             padding: 12px 30px;
-            background-color: #a0522d;
-            color: #ffffff;
-            text-decoration: none;
+            background-color: var(--color-medium-brown);
+            color: var(--color-text-light);
+            border: 2px solid var(--color-gold); /* Золотая обводка */
             border-radius: 5px;
             font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); /* Золотое свечение */
         }
 
         .hero-button:hover {
-            background-color: #8b4513;
+            background-color: var(--color-dark-brown);
             transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 215, 0, 0.8);
         }
 
         /* Общие секции */
@@ -126,146 +125,108 @@
         .section h3 {
             font-family: serif;
             font-size: 2.2em;
-            color: #8b4513;
+            color: var(--color-gold); /* Золотые заголовки */
             margin-bottom: 40px;
         }
         
         /* Стиль для информационных секций (О нас, Доставка, Заказ) */
         .info-section {
-            background-color: #f9f5f0; 
+            background-color: var(--color-dark-brown); /* Темный фон для блоков */
+            border: 1px solid var(--color-medium-brown);
             border-radius: 10px; 
             padding: 40px;
             margin: 40px auto;
             max-width: 800px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            color: var(--color-text-light);
         }
 
         /* Секция продуктов (Каталог) */
         .products-section {
-            background-color: #f7f7f7;
-        }
-
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
+            background-color: var(--color-background); /* Фон каталога */
         }
 
         .product-card {
-            background-color: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-            text-align: left;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            background-color: var(--color-dark-brown); /* Темный фон карточки */
+            border: 1px solid var(--color-medium-brown);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-        }
-
-        .product-card img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-        }
-
-        .product-info {
-            padding: 20px;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3); /* Золотое свечение при наведении */
         }
 
         .product-info h4 {
-            font-family: serif;
-            font-size: 1.5em;
-            color: #a0522d;
-            margin-top: 0;
-            margin-bottom: 10px;
+            color: var(--color-gold); /* Золотые названия продуктов */
         }
 
         .product-info p {
-            font-size: 1em;
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.4;
+            color: var(--color-text-light);
         }
 
         .price {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #8b4513;
-            margin-bottom: 20px;
+            color: var(--color-gold); /* Золотая цена */
         }
 
+        /* ФИКС: Кнопка "Заказать" на всю ширину, золотая, с эффектом */
         .buy-button {
             display: block;
             width: 100%;
             padding: 10px;
-            background-color: #ffd700;
-            color: #4b4b4b;
-            text-decoration: none;
+            background-color: var(--color-gold); /* Золотая кнопка */
+            color: var(--color-text-dark); /* Темный текст на золотом */
             border: none;
             border-radius: 5px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
         }
 
         .buy-button:hover {
-            background-color: #e5c100;
+            background-color: #e5c100; /* Чуть темнее золото */
+            transform: translateY(-1px);
         }
         
         /* Футер */
         .footer {
-            background-color: #333;
+            background-color: var(--color-dark-brown);
             color: #ccc;
             padding: 40px 50px;
-            text-align: center;
-            font-size: 0.9em;
-        }
-
-        .footer p {
-            margin: 0;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.2);
         }
 
         .footer a {
-            color: #ffd700;
-            text-decoration: none;
-            margin: 0 10px;
+            color: var(--color-gold);
         }
 
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Персонализация (для демонстрации) */
+        /* Персонализация */
         .customer-code {
-            font-size: 0.8em;
-            color: #8b4513;
-            margin-top: 5px;
+            color: var(--color-gold);
         }
 
         /* Адаптивность для мобильных */
         @media (max-width: 768px) {
-            /* Навигация */
+            /* ФИКС: Корректное отображение меню на мобильных (убрана прокрутка) */
             .header {
                 padding: 10px 15px; 
+            }
+            .header nav {
+                 /* Ключевой фикс: делаем меню горизонтальным для мобильных, убираем сдвиг */
+                display: flex;
+                justify-content: flex-end;
             }
             .header nav a {
                 font-size: 0.8em; 
                 margin-left: 10px; 
             }
 
-            /* Hero-секция */
-            .hero { 
-                min-height: 40vh; 
-                background-attachment: scroll; 
-                background-position: center center; 
+            .product-card img {
+                /* ФИКС: Убеждаемся, что изображение занимает всю ширину и не ломает контейнер */
+                max-width: 100%; 
             }
-            .hero h2 { font-size: 2em; }
-            .products-section { padding: 30px 0; }
         }
     </style>
 </head>
@@ -294,30 +255,30 @@
         <div class="product-grid">
             
             <div class="product-card">
-                <img src="https://ibb.co/4wLXVVT8" alt="ТВОЕ ОПИСАНИЕ КАРТИНКИ 1">
+                <img src="https://i.ibb.co/Fk1yDDw5/IMG-3903.jpg" alt="Молочный шоколад с клубникой">
                 <div class="product-info">
-                    <h4>Шоколад с клубникой</h4>
-                    <p>Плитка молочного шоколада с сублимированной клубникой.</p>
+                    <h4>Плитка молочного шоколада с сублимированной клубникой</h4>
+                    <p>Настоящая клубника в лучшем молочном шоколаде. Идеальное сочетание сладости и кислинки, которое тает во рту.</p>
                     <div class="price">1500 ₽</div>
                     <a href="#contact" class="buy-button">Заказать</a>
                 </div>
             </div>
             
             <div class="product-card">
-                <img src="https://ibb.co/Sz2RgrR" alt="ТВОЕ ОПИСАНИЕ КАРТИНКИ 2">
+                <img src="https://i.ibb.co/TsZmGLm/IMG-3902.jpg" alt="Молочный шоколад пломбир крем-брюле">
                 <div class="product-info">
-                    <h4>Шоколад с мороженным</h4>
-                    <p>Плитка молочного шоколада с мороженным пломбир - крем-брюле.</p>
+                    <h4>Плитка молочного шоколада с мороженным пломбир - крем-брюле</h4>
+                    <p>Эксклюзивное сочетание, имитирующее вкус нежного пломбира и карамелизированного крем-брюле. Наслаждение для гурманов.</p>
                     <div class="price">1600 ₽</div>
                     <a href="#contact" class="buy-button">Заказать</a>
                 </div>
             </div>
 
             <div class="product-card">
-                <img src="https://ibb.co/Kc22yG0S" alt="ТВОЕ ОПИСАНИЕ КАРТИНКИ 3">
+                <img src="https://i.ibb.co/Q7PPmcbt/IMG-3901.jpg" alt="Молочный шоколад с манго">
                 <div class="product-info">
-                    <h4>Шоколад с манго</h4>
-                    <p>Плитка молочного шоколада с манго.</p>
+                    <h4>Плитка молочного шоколада с манго</h4>
+                    <p>Тропический взрыв! Сочный, сладкий манго в молочном шоколаде. Идеально для тех, кто ищет необычные вкусовые решения.</p>
                     <div class="price">1500 ₽</div>
                     <a href="#contact" class="buy-button">Заказать</a>
                 </div>
