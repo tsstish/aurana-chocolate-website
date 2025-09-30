@@ -50,6 +50,26 @@ def generate_unique_code(conn):
         exists = conn.execute('SELECT code FROM customers WHERE code = ?', (code,)).fetchone()
         if not exists:
             return code
+            
+# =========================================================================
+# НОВАЯ/ИЗМЕНЕННАЯ: Функция для безопасного парсинга дат SQLite
+# =========================================================================
+def parse_date_robustly(date_string):
+    """Пытается парсить дату в разных форматах SQLite (с микросекундами и без)."""
+    if not date_string:
+        return None
+    # 1. Сначала пытаемся парсить с микросекундами (%f)
+    try:
+        return datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f')
+    except ValueError:
+        pass
+    # 2. Если не сработало, пробуем без микросекунд
+    try:
+        return datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        pass
+        
+    return None # Если все попытки неудачны
 
 
 @app.route('/')
@@ -82,24 +102,21 @@ def index():
                            is_registered=is_registered,
                            products=get_products())
 
-# НОВЫЙ МАРШРУТ: Личный кабинет
+# МАРШРУТ: Личный кабинет (ИСПОЛЬЗУЕТ НОВУЮ ФУНКЦИЮ ПАРСИНГА)
 @app.route('/profile')
 def profile():
     customer_code = request.cookies.get('customer_code')
     
     if not customer_code:
-        # Если нет кода, отправляем на главную
         return redirect(url_for('index'))
     
     conn = get_db()
     
-    # Получаем данные клиента
     customer = conn.execute(
         'SELECT name, registration_date FROM customers WHERE code = ?', 
         (customer_code,)
     ).fetchone()
 
-    # Получаем все заказы клиента
     order_rows = conn.execute(
         'SELECT order_details, order_date, status FROM orders WHERE customer_code = ? ORDER BY order_date DESC', 
         (customer_code,)
@@ -110,24 +127,27 @@ def profile():
     orders = []
     for row in order_rows:
         try:
-            # Парсим JSON-строку обратно в Python-объект (список товаров)
             items = json.loads(row['order_details'])
         except json.JSONDecodeError:
-            # Обработка ошибки, если JSON-данные заказа повреждены
             items = [{"name": "Ошибка данных", "qty": 1, "price": 0}]
 
+        # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ: Надежное получение объекта даты
+        order_date_obj = parse_date_robustly(row['order_date'])
+
         orders.append({
-            # Форматируем дату для красивого отображения
-            'order_date': datetime.strptime(row['order_date'], '%Y-%m-%d %H:%M:%S'), 
+            'order_date': order_date_obj,
             'status': row['status'],
             'items': items
         })
 
     # Форматируем дату регистрации клиента
+    reg_date = "Дата неизвестна"
     if customer and customer['registration_date']:
-        reg_date = datetime.strptime(customer['registration_date'], '%Y-%m-%d %H:%M:%S').strftime('%d.%m.%Y')
-    else:
-        reg_date = "Дата неизвестна"
+        # ИСПОЛЬЗУЕМ НОВУЮ ФУНКЦИЮ: Надежное получение объекта даты
+        reg_date_obj = parse_date_robustly(customer['registration_date'])
+        
+        if reg_date_obj:
+            reg_date = reg_date_obj.strftime('%d.%m.%Y')
 
     return render_template('profile.html',
                            code=customer_code,
@@ -137,7 +157,6 @@ def profile():
 
 @app.route('/place_order', methods=['POST'])
 def place_order():
-    # ... (логика place_order остается без изменений) ...
     customer_code = request.cookies.get('customer_code')
     name = request.form.get('name')
     contact = request.form.get('contact')
@@ -168,8 +187,6 @@ def place_order():
     conn.commit()
     conn.close()
     
-    # Здесь можно было бы добавить вызов send_order_email, но ты просила пока остановиться
-    
     resp = make_response(redirect(url_for('order_success', code=customer_code)))
     resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
     
@@ -177,14 +194,12 @@ def place_order():
 
 @app.route('/order_success')
 def order_success():
-    # ... (логика order_success остается без изменений) ...
     code = request.args.get('code', 'AXXXXX')
     return render_template('success.html', code=code)
 
 
 @app.route('/qr/<customer_code>')
 def qr_entry(customer_code):
-    # ... (логика qr_entry остается без изменений) ...
     conn = get_db()
     
     exists = conn.execute('SELECT code FROM customers WHERE code = ?', (customer_code,)).fetchone()
