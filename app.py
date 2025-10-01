@@ -4,34 +4,60 @@ import json
 import random
 import os
 import shutil 
-from datetime import datetime # ВАЖНО: УБЕДИТЕСЬ, ЧТО ЭТОТ ИМПОРТ ЕСТЬ!
+from datetime import datetime
+from threading import Lock
 
 app = Flask(__name__)
 # Указываем имя файла, а не путь
 DATABASE_FILE = 'customers.db'
 # Определяем путь к базе данных на Vercel. Временные файлы хранятся в /tmp.
 DATABASE = os.path.join('/tmp', DATABASE_FILE)
+# Защита от одновременного доступа к БД
+db_lock = Lock()
+
 
 # =========================================================================
-# ФУНКЦИИ БАЗЫ ДАННЫХ
+# ФУНКЦИЯ ИНИЦИАЛИЗАЦИИ БД (СОЗДАЕТ ТАБЛИЦЫ, ЕСЛИ ОНИ НЕ СУЩЕСТВУЮТ)
 # =========================================================================
-def ensure_db_exists():
-    if not os.path.exists(DATABASE):
-        # Если файл не существует в /tmp, копируем его из корневой папки.
-        if os.path.exists(DATABASE_FILE):
-            shutil.copyfile(DATABASE_FILE, DATABASE)
-            print(f"База данных скопирована в {DATABASE}")
-        else:
-            print("ВНИМАНИЕ: База данных не найдена. Создание новой.")
-            conn = sqlite3.connect(DATABASE)
-            conn.close()
+def init_db():
+    with db_lock:
+        conn = sqlite3.connect(DATABASE)
+        cursor = conn.cursor()
+        
+        # Создание таблицы клиентов
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS customers (
+                code TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                contact TEXT NOT NULL,
+                registered INTEGER DEFAULT 0,
+                registration_date TEXT,
+                first_visit TEXT,
+                last_visit TEXT
+            )
+        """)
+        
+        # Создание таблицы заказов
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS orders (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                customer_code TEXT,
+                order_details TEXT NOT NULL,
+                order_date TEXT DEFAULT CURRENT_TIMESTAMP,
+                status TEXT DEFAULT 'Новый',
+                FOREIGN KEY (customer_code) REFERENCES customers(code)
+            )
+        """)
+        conn.commit()
+        conn.close()
 
 def get_db():
-    """Устанавливает соединение с базой данных в /tmp."""
-    ensure_db_exists() 
+    """Устанавливает соединение с базой данных в /tmp и инициализирует ее, если необходимо."""
+    init_db() # Гарантируем, что таблицы существуют
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+# =========================================================================
 
 def get_products():
     return [
@@ -48,9 +74,7 @@ def generate_unique_code(conn):
         if not exists:
             return code
             
-# =========================================================================
 # ФУНКЦИЯ ФОРМАТИРОВАНИЯ ДАТЫ (РАБОТАЕТ НА СЕРВЕРЕ И ВОЗВРАЩАЕТ СТРОКУ)
-# =========================================================================
 def format_date_for_display(date_string):
     """Пытается парсить дату в разных форматах SQLite и возвращает готовую строку."""
     if not date_string:
@@ -104,7 +128,7 @@ def index():
                            is_registered=is_registered,
                            products=get_products())
 
-# МАРШРУТ: Личный кабинет (ИСПОЛЬЗУЕТ БЕЗОПАСНОЕ ФОРМАТИРОВАНИЕ ДАТЫ)
+# МАРШРУТ: Личный кабинет 
 @app.route('/profile')
 def profile():
     customer_code = request.cookies.get('customer_code')
@@ -134,13 +158,11 @@ def profile():
             items = [{"name": "Ошибка данных", "qty": 1, "price": 0}]
 
         orders.append({
-            # Передаем в шаблон ГОТОВУЮ СТРОКУ
             'order_date': format_date_for_display(row['order_date']),
             'status': row['status'],
             'items': items
         })
 
-    # Форматируем дату регистрации клиента
     reg_date = format_date_for_display(customer['registration_date']) if customer and customer['registration_date'] else "Дата неизвестна"
 
     return render_template('profile.html',
@@ -214,4 +236,6 @@ def qr_entry(customer_code):
         return redirect(url_for('index'))
 
 if __name__ == '__main__':
+    # При локальном запуске также инициализируем БД
+    init_db() 
     app.run(debug=True)
