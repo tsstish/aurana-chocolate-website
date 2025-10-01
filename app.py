@@ -1,65 +1,75 @@
-import sqlite3
+import sqlite3 # Оставляем импорт, но не используем его
 from flask import Flask, render_template, request, redirect, url_for, make_response
 import json
 import random
 import os
 from datetime import datetime
+import csv # Используем CSV для сохранения данных
 from threading import Lock
-import traceback 
 
 app = Flask(__name__)
-# Указываем имя файла, а не путь
-DATABASE_FILE = 'customers.db'
-# Определяем путь к базе данных на Vercel. Временные файлы хранятся в /tmp.
-DATABASE = os.path.join('/tmp', DATABASE_FILE)
-# Защита от одновременного доступа к БД
-db_lock = Lock()
 
+# Путь для временного хранения данных заказа в Vercel
+ORDERS_FILE = os.path.join('/tmp', 'orders.csv')
+CUSTOMERS_FILE = os.path.join('/tmp', 'customers.json')
+file_lock = Lock()
 
 # =========================================================================
-# ФУНКЦИИ БАЗЫ ДАННЫХ И ИНИЦИАЛИЗАЦИЯ (ОСТАВЛЯЕМ КАК ЕСТЬ)
+# ФУНКЦИИ УПРАВЛЕНИЯ ДАННЫМИ (ЗАГЛУШКИ)
 # =========================================================================
-def init_db():
-    with db_lock:
-        conn = None
-        try:
-            conn = sqlite3.connect(DATABASE)
-            cursor = conn.cursor()
-            
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS customers (
-                    code TEXT PRIMARY KEY,
-                    name TEXT NOT NULL,
-                    contact TEXT NOT NULL,
-                    registered INTEGER DEFAULT 0,
-                    registration_date TEXT,
-                    first_visit TEXT,
-                    last_visit TEXT
-                )
-            """)
-            
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS orders (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    customer_code TEXT,
-                    order_details TEXT NOT NULL,
-                    order_date TEXT DEFAULT CURRENT_TIMESTAMP,
-                    status TEXT DEFAULT 'Новый',
-                    FOREIGN KEY (customer_code) REFERENCES customers(code)
-                )
-            """)
-            conn.commit()
-        except Exception as e:
-            print(f"Ошибка при инициализации БД: {e}")
-        finally:
-            if conn:
-                conn.close()
 
-def get_db():
-    init_db() 
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+def ensure_files_exist():
+    """Создает пустые файлы заказов и клиентов, если они не существуют."""
+    with file_lock:
+        if not os.path.exists(ORDERS_FILE):
+            with open(ORDERS_FILE, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['customer_code', 'order_details', 'status', 'order_date'])
+        
+        if not os.path.exists(CUSTOMERS_FILE):
+            with open(CUSTOMERS_FILE, 'w', encoding='utf-8') as f:
+                json.dump({}, f)
+
+def load_customers():
+    """Загружает данные клиентов из JSON-файла."""
+    ensure_files_exist()
+    with file_lock:
+        with open(CUSTOMERS_FILE, 'r', encoding='utf-8') as f:
+            try:
+                return json.load(f)
+            except json.JSONDecodeError:
+                return {}
+
+def save_customers(data):
+    """Сохраняет данные клиентов в JSON-файл."""
+    with file_lock:
+        with open(CUSTOMERS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4)
+
+def load_orders(customer_code=None):
+    """Загружает заказы из CSV-файла."""
+    ensure_files_exist()
+    orders = []
+    with file_lock:
+        with open(ORDERS_FILE, 'r', newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if not customer_code or row['customer_code'] == customer_code:
+                    orders.append(row)
+    # Сортировка по дате (имитация БД)
+    orders.sort(key=lambda x: x['order_date'], reverse=True)
+    return orders
+
+def generate_unique_code(customers):
+    while True:
+        number = random.randint(1000, 9999) 
+        code = f"A{number:04d}"
+        if code not in customers:
+            return code
+
+# =========================================================================
+# ОСТАЛЬНЫЕ ФУНКЦИИ И МАРШРУТЫ
+# =========================================================================
 
 def get_products():
     return [
@@ -67,57 +77,33 @@ def get_products():
         {"id": "A02", "name": "Плитка молочного шоколада с мороженным пломбир - крем-брюле", "price": 1600},
         {"id": "A03", "name": "Плитка молочного шоколада с манго", "price": 1500},
     ]
-
-def generate_unique_code(conn):
-    while True:
-        number = random.randint(1000, 9999) 
-        code = f"A{number:04d}"
-        exists = conn.execute('SELECT code FROM customers WHERE code = ?', (code,)).fetchone()
-        if not exists:
-            return code
             
 def format_date_for_display(date_string):
     if not date_string:
         return "Дата неизвестна"
-        
-    formats = ['%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d']
-    
-    for fmt in formats:
-        try:
-            dt_obj = datetime.strptime(date_string, fmt)
-            return dt_obj.strftime('%d.%m.%Y %H:%M')
-        except ValueError:
-            continue
-        
-    return "Ошибка формата даты"
+    try:
+        dt_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S.%f')
+        return dt_obj.strftime('%d.%m.%Y %H:%M')
+    except ValueError:
+        return date_string # Если не можем распарсить, возвращаем как есть
 
-# =========================================================================
-# МАРШРУТЫ
-# =========================================================================
-
+# МАРШРУТ: Главная страница
 @app.route('/')
 def index():
     customer_code = request.cookies.get('customer_code')
+    customers = load_customers()
     name = None
     is_registered = False
 
-    conn = get_db()
-    
-    if customer_code:
-        customer_data = conn.execute(
-            'SELECT name, registered, last_visit FROM customers WHERE code = ?', 
-            (customer_code,)
-        ).fetchone()
-
-        if customer_data:
-            name = customer_data['name']
-            is_registered = customer_data['registered']
-            
-            conn.execute('UPDATE customers SET last_visit = CURRENT_TIMESTAMP WHERE code = ?', (customer_code,))
-            conn.commit()
-
-    conn.close()
-
+    if customer_code and customer_code in customers:
+        customer_data = customers[customer_code]
+        name = customer_data.get('name')
+        is_registered = True
+        
+        # Обновляем время последнего посещения
+        customers[customer_code]['last_visit'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        save_customers(customers)
+        
     return render_template('index.html', 
                            customer_code=customer_code,
                            name=name,
@@ -125,6 +111,7 @@ def index():
                            products=get_products())
 
 
+# МАРШРУТ: Личный кабинет (Теперь использует файлы-заглушки)
 @app.route('/profile')
 def profile():
     customer_code = request.cookies.get('customer_code')
@@ -132,25 +119,15 @@ def profile():
     if not customer_code:
         return redirect(url_for('index'))
     
-    conn = get_db()
+    customers = load_customers()
     
-    try:
-        customer = conn.execute(
-            'SELECT name, registration_date FROM customers WHERE code = ?', 
-            (customer_code,)
-        ).fetchone()
-    except Exception:
-        customer = None
-        
-    try:
-        order_rows = conn.execute(
-            'SELECT order_details, order_date, status FROM orders WHERE customer_code = ? ORDER BY order_date DESC', 
-            (customer_code,)
-        ).fetchall()
-    except Exception:
-        order_rows = []
-        
-    conn.close()
+    customer = customers.get(customer_code)
+    
+    if not customer:
+        return redirect(url_for('index'))
+
+    # Загружаем заказы по коду клиента
+    order_rows = load_orders(customer_code)
     
     orders = []
     for row in order_rows:
@@ -165,21 +142,15 @@ def profile():
             'items': items
         })
 
-    if customer and customer['registration_date']:
-        reg_date = format_date_for_display(customer['registration_date'])
-    else:
-        reg_date = "Дата неизвестна"
-
-    customer_name = customer['name'] if customer and customer['name'] else "Клиент"
+    reg_date = format_date_for_display(customer.get('registration_date'))
 
     return render_template('profile.html',
                            code=customer_code,
-                           customer_name=customer_name,
+                           customer_name=customer.get('name', 'Клиент'),
                            registration_date=reg_date,
                            orders=orders)
 
 
-# МАРШРУТ: Оформление заказа (Усиленная защита)
 @app.route('/place_order', methods=['POST'])
 def place_order():
     customer_code = request.cookies.get('customer_code')
@@ -187,67 +158,81 @@ def place_order():
     contact = request.form.get('contact')
     order_details_json = request.form.get('order_details_json') 
     
-    # 1. Защита от пустых полей
     if not name or not contact or not order_details_json:
-        # Если данных нет, возвращаем пользователя обратно на главную
         return redirect(url_for('index')) 
 
-    conn = get_db()
+    customers = load_customers()
     
     try:
-        if not customer_code:
-            # Новый клиент
-            customer_code = generate_unique_code(conn)
-            
-            conn.execute(
-                'INSERT INTO customers (code, name, contact, registered, registration_date, first_visit) VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-                (customer_code, name, contact)
-            )
+        # 1. Обработка клиента
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        if not customer_code or customer_code not in customers:
+            customer_code = generate_unique_code(customers)
+            customers[customer_code] = {
+                'code': customer_code,
+                'name': name,
+                'contact': contact,
+                'registered': 1,
+                'registration_date': now_str,
+                'first_visit': now_str,
+                'last_visit': now_str
+            }
         else:
-            # Существующий клиент
-            conn.execute(
-                'UPDATE customers SET name = ?, contact = ?, registered = 1, last_visit = CURRENT_TIMESTAMP WHERE code = ?',
-                (name, contact, customer_code)
-            )
+            customers[customer_code].update({
+                'name': name,
+                'contact': contact,
+                'registered': 1,
+                'last_visit': now_str
+            })
+        
+        save_customers(customers)
 
-        # 2. Вставка заказа
-        conn.execute(
-            'INSERT INTO orders (customer_code, order_details, status) VALUES (?, ?, ?)',
-            (customer_code, order_details_json, 'Новый')
-        )
-        conn.commit()
+        # 2. Сохранение заказа в CSV
+        order_data = {
+            'customer_code': customer_code,
+            'order_details': order_details_json,
+            'status': 'Новый',
+            'order_date': now_str
+        }
+        
+        with file_lock:
+            with open(ORDERS_FILE, 'a', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(list(order_data.values()))
+        
     except Exception as e:
-        # Ловим все возможные ошибки БД и логируем
-        print(f"Ошибка при сохранении заказа: {e}")
-        # В случае ошибки, возвращаем на главную, не падаем с 500
-        return redirect(url_for('index'))
-    finally:
-        conn.close()
+        print(f"КРИТИЧЕСКАЯ ОШИБКА сохранения заказа в файл: {e}")
+        return redirect(url_for('index')) 
     
-    # 3. Перенаправляем на страницу успеха (order_success)
-    # Это гарантирует, что куки установятся до перехода в ЛК
+    # 3. Перенаправляем на страницу успеха
     resp = make_response(redirect(url_for('order_success', code=customer_code)))
     resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60, httponly=True) 
     
     return resp
 
-# МАРШРУТ: Страница успеха (ВОССТАНОВЛЕНА)
 @app.route('/order_success')
 def order_success():
     code = request.args.get('code', 'AXXXXX')
-    # Для целей отладки, покажем страницу успеха, а не сразу перейдем в ЛК
     return render_template('success.html', code=code)
 
 
 @app.route('/qr/<customer_code>')
 def qr_entry(customer_code):
-    conn = get_db()
+    customers = load_customers()
     
-    exists = conn.execute('SELECT code FROM customers WHERE code = ?', (customer_code,)).fetchone()
-    
-    if exists:
+    if customer_code in customers:
         resp = make_response(redirect(url_for('index')))
         resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
         
-        conn.execute(
-             'UPDATE customers SET first_visit = COALES
+        now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+        customers[customer_code]['last_visit'] = now_str
+        customers[customer_code]['first_visit'] = customers[customer_code].get('first_visit', now_str)
+        save_customers(customers)
+        
+        return resp
+    else:
+        return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    ensure_files_exist() 
+    app.run(debug=True)
