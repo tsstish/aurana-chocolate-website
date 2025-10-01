@@ -5,7 +5,7 @@ import random
 import os
 from datetime import datetime
 from threading import Lock
-import traceback # Добавлен для отладки, если ошибка останется
+import traceback 
 
 app = Flask(__name__)
 # Указываем имя файла, а не путь
@@ -17,17 +17,15 @@ db_lock = Lock()
 
 
 # =========================================================================
-# ФУНКЦИИ БАЗЫ ДАННЫХ И ИНИЦИАЛИЗАЦИЯ
+# ФУНКЦИИ БАЗЫ ДАННЫХ И ИНИЦИАЛИЗАЦИЯ (ОСТАВЛЯЕМ КАК ЕСТЬ)
 # =========================================================================
 def init_db():
-    # Эта функция гарантирует, что БД и таблицы существуют в /tmp
     with db_lock:
         conn = None
         try:
             conn = sqlite3.connect(DATABASE)
             cursor = conn.cursor()
             
-            # Создание таблицы клиентов
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS customers (
                     code TEXT PRIMARY KEY,
@@ -40,7 +38,6 @@ def init_db():
                 )
             """)
             
-            # Создание таблицы заказов
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS orders (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,8 +56,7 @@ def init_db():
                 conn.close()
 
 def get_db():
-    """Устанавливает соединение с базой данных в /tmp и инициализирует ее, если необходимо."""
-    init_db() # Гарантируем, что таблицы существуют
+    init_db() 
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
@@ -80,13 +76,10 @@ def generate_unique_code(conn):
         if not exists:
             return code
             
-# ФУНКЦИЯ ФОРМАТИРОВАНИЯ ДАТЫ (С МАКСИМАЛЬНОЙ ЗАЩИТОЙ ОТ ПАДЕНИЯ)
 def format_date_for_display(date_string):
-    """Пытается парсить дату в разных форматах SQLite и возвращает готовую строку."""
     if not date_string:
         return "Дата неизвестна"
         
-    # Пытаемся парсить в разных форматах
     formats = ['%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S', '%Y-%m-%d']
     
     for fmt in formats:
@@ -94,74 +87,12 @@ def format_date_for_display(date_string):
             dt_obj = datetime.strptime(date_string, fmt)
             return dt_obj.strftime('%d.%m.%Y %H:%M')
         except ValueError:
-            continue # Пробуем следующий формат
+            continue
         
     return "Ошибка формата даты"
 
-
 # =========================================================================
-# МАРШРУТ: Личный кабинет (Основной источник 500-й ошибки)
-# =========================================================================
-@app.route('/profile')
-def profile():
-    customer_code = request.cookies.get('customer_code')
-    
-    if not customer_code:
-        return redirect(url_for('index'))
-    
-    conn = get_db()
-    
-    # 1. Защита при получении данных клиента
-    try:
-        customer = conn.execute(
-            'SELECT name, registration_date FROM customers WHERE code = ?', 
-            (customer_code,)
-        ).fetchone()
-    except Exception:
-        customer = None
-        
-    # 2. Получение данных заказов
-    try:
-        order_rows = conn.execute(
-            'SELECT order_details, order_date, status FROM orders WHERE customer_code = ? ORDER BY order_date DESC', 
-            (customer_code,)
-        ).fetchall()
-    except Exception:
-        order_rows = []
-        
-    conn.close()
-    
-    orders = []
-    for row in order_rows:
-        try:
-            # Десериализация JSON с защитой
-            items = json.loads(row['order_details'])
-        except (json.JSONDecodeError, TypeError):
-            items = [{"name": "Ошибка данных заказа", "qty": 1, "price": 0}]
-
-        orders.append({
-            'order_date': format_date_for_display(row['order_date']),
-            'status': row['status'],
-            'items': items
-        })
-
-    # 3. Форматирование даты регистрации с защитой
-    if customer and customer['registration_date']:
-        reg_date = format_date_for_display(customer['registration_date'])
-    else:
-        reg_date = "Дата неизвестна"
-
-    # Если customer не найден (хотя код есть), используем заглушку
-    customer_name = customer['name'] if customer and customer['name'] else "Клиент"
-
-    return render_template('profile.html',
-                           code=customer_code,
-                           customer_name=customer_name, # Можно использовать в шаблоне
-                           registration_date=reg_date,
-                           orders=orders)
-
-# =========================================================================
-# ОСТАЛЬНЫЕ МАРШРУТЫ (оставлены без изменений, как в предыдущем ответе)
+# МАРШРУТЫ
 # =========================================================================
 
 @app.route('/')
@@ -194,6 +125,61 @@ def index():
                            products=get_products())
 
 
+@app.route('/profile')
+def profile():
+    customer_code = request.cookies.get('customer_code')
+    
+    if not customer_code:
+        return redirect(url_for('index'))
+    
+    conn = get_db()
+    
+    try:
+        customer = conn.execute(
+            'SELECT name, registration_date FROM customers WHERE code = ?', 
+            (customer_code,)
+        ).fetchone()
+    except Exception:
+        customer = None
+        
+    try:
+        order_rows = conn.execute(
+            'SELECT order_details, order_date, status FROM orders WHERE customer_code = ? ORDER BY order_date DESC', 
+            (customer_code,)
+        ).fetchall()
+    except Exception:
+        order_rows = []
+        
+    conn.close()
+    
+    orders = []
+    for row in order_rows:
+        try:
+            items = json.loads(row['order_details'])
+        except (json.JSONDecodeError, TypeError):
+            items = [{"name": "Ошибка данных заказа", "qty": 1, "price": 0}]
+
+        orders.append({
+            'order_date': format_date_for_display(row['order_date']),
+            'status': row['status'],
+            'items': items
+        })
+
+    if customer and customer['registration_date']:
+        reg_date = format_date_for_display(customer['registration_date'])
+    else:
+        reg_date = "Дата неизвестна"
+
+    customer_name = customer['name'] if customer and customer['name'] else "Клиент"
+
+    return render_template('profile.html',
+                           code=customer_code,
+                           customer_name=customer_name,
+                           registration_date=reg_date,
+                           orders=orders)
+
+
+# МАРШРУТ: Оформление заказа (Усиленная защита)
 @app.route('/place_order', methods=['POST'])
 def place_order():
     customer_code = request.cookies.get('customer_code')
@@ -201,44 +187,56 @@ def place_order():
     contact = request.form.get('contact')
     order_details_json = request.form.get('order_details_json') 
     
+    # 1. Защита от пустых полей
     if not name or not contact or not order_details_json:
+        # Если данных нет, возвращаем пользователя обратно на главную
         return redirect(url_for('index')) 
 
     conn = get_db()
     
-    if not customer_code:
-        customer_code = generate_unique_code(conn)
-        
-        conn.execute(
-            'INSERT INTO customers (code, name, contact, registered, registration_date, first_visit) VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
-            (customer_code, name, contact)
-        )
-    else:
-        conn.execute(
-            'UPDATE customers SET name = ?, contact = ?, registered = 1, last_visit = CURRENT_TIMESTAMP WHERE code = ?',
-            (name, contact, customer_code)
-        )
+    try:
+        if not customer_code:
+            # Новый клиент
+            customer_code = generate_unique_code(conn)
+            
+            conn.execute(
+                'INSERT INTO customers (code, name, contact, registered, registration_date, first_visit) VALUES (?, ?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+                (customer_code, name, contact)
+            )
+        else:
+            # Существующий клиент
+            conn.execute(
+                'UPDATE customers SET name = ?, contact = ?, registered = 1, last_visit = CURRENT_TIMESTAMP WHERE code = ?',
+                (name, contact, customer_code)
+            )
 
-    conn.execute(
-        'INSERT INTO orders (customer_code, order_details, status) VALUES (?, ?, ?)',
-        (customer_code, order_details_json, 'Новый')
-    )
-    conn.commit()
-    conn.close()
+        # 2. Вставка заказа
+        conn.execute(
+            'INSERT INTO orders (customer_code, order_details, status) VALUES (?, ?, ?)',
+            (customer_code, order_details_json, 'Новый')
+        )
+        conn.commit()
+    except Exception as e:
+        # Ловим все возможные ошибки БД и логируем
+        print(f"Ошибка при сохранении заказа: {e}")
+        # В случае ошибки, возвращаем на главную, не падаем с 500
+        return redirect(url_for('index'))
+    finally:
+        conn.close()
     
-    # ФИКС: Перенаправляем на страницу успеха (order_success), которая затем отправляет в ЛК
+    # 3. Перенаправляем на страницу успеха (order_success)
+    # Это гарантирует, что куки установятся до перехода в ЛК
     resp = make_response(redirect(url_for('order_success', code=customer_code)))
-    resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
+    resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60, httponly=True) 
     
     return resp
 
+# МАРШРУТ: Страница успеха (ВОССТАНОВЛЕНА)
 @app.route('/order_success')
 def order_success():
-    # Эта страница просто нужна как промежуточная точка для установки cookie
     code = request.args.get('code', 'AXXXXX')
-    
-    # Сразу перенаправляем в личный кабинет, чтобы исключить задержки
-    return redirect(url_for('profile'))
+    # Для целей отладки, покажем страницу успеха, а не сразу перейдем в ЛК
+    return render_template('success.html', code=code)
 
 
 @app.route('/qr/<customer_code>')
@@ -252,16 +250,4 @@ def qr_entry(customer_code):
         resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
         
         conn.execute(
-             'UPDATE customers SET first_visit = COALESCE(first_visit, CURRENT_TIMESTAMP), last_visit = CURRENT_TIMESTAMP WHERE code = ?', 
-             (customer_code,)
-        )
-        conn.commit()
-        conn.close()
-        return resp
-    else:
-        conn.close()
-        return redirect(url_for('index'))
-
-if __name__ == '__main__':
-    init_db() 
-    app.run(debug=True)
+             'UPDATE customers SET first_visit = COALES

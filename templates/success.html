@@ -3,71 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заказ принят! – Aurana Chocolate</title>
+    <title>Заказ оформлен!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=10"> 
     <style>
-        :root {
-            --color-dark-primary: #1e1717; 
-            --color-dark-secondary: #3b2f2f; 
-            --color-bronze: #b8860b; 
-            --color-gold-light: #ffd700; 
-            --color-text-light: #f0f0f0; 
-        }
         body {
-            font-family: sans-serif;
-            background-color: var(--color-dark-primary);
-            color: var(--color-text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             text-align: center;
-            padding: 50px;
+            padding-top: 0;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
+        .success-box {
             background-color: var(--color-dark-secondary);
-            border-radius: 10px;
             padding: 40px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        h1 {
-            color: var(--color-gold-light);
-            font-size: 2.5em;
-        }
-        p {
-            font-size: 1.1em;
-            line-height: 1.6;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
         }
         .highlight {
             color: var(--color-bronze);
             font-weight: bold;
         }
-        .back-button {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 12px 30px;
-            background-color: var(--color-bronze);
-            color: var(--color-text-light);
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎉 Заказ принят!</h1>
-        <p>Благодарим вас за выбор Aurana Chocolate.</p>
-        
-        <p style="font-size: 1.3em; font-weight: bold; color: var(--color-bronze); margin: 25px 0;">
-            Мы свяжемся с вами в течение 30 минут для подтверждения деталей и доставки.
-        </p>
-        
-        <p>Ваш персональный код лояльности: <span class="highlight">{{ code }}</span></p>
-        <p>Если вы заказываете впервые, этот код закреплен за вами. Сохраните его!</p>
-        
-        <a href="/" class="back-button">Вернуться на главную</a>
+    <div class="success-box">
+        <h1>✅ Заказ оформлен!</h1>
+        <p>Спасибо за ваш заказ! Мы свяжемся с вами в ближайшее время для уточнения деталей.</p>
+        <p>Ваш код клиента: <span class="highlight">{{ code }}</span></p>
+        <div style="margin-top: 30px;">
+            <a href="{{ url_for('profile') }}" class="cta-button" style="display: inline-block; margin-right: 15px;">Перейти в Личный кабинет</a>
+            <a href="{{ url_for('index') }}" class="cta-button">На главную</a>
+        </div>
     </div>
-    <script>
-        // Очищаем корзину в LocalStorage после успешного заказа
-        localStorage.removeItem('aurana_cart');
-    </script>
 </body>
 </html>
