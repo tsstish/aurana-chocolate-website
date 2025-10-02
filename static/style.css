@@ -1,26 +1,195 @@
-/* static/style.css - Минимальный код для проверки, что файл загружается */
+/* static/style.css */
 
+/* Базовый сброс и фон */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #333; /* Должен стать темным */
-    color: #fff; /* Должен стать белым */
+    background-color: #333333; /* Темный фон */
+    color: #f0f0f0; /* Светлый текст */
+    line-height: 1.6;
 }
 
+/* Заголовок и навигация */
 .main-header {
-    background-color: #222;
-    padding: 10px;
+    background-color: #1a1a1a;
+    padding: 15px 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
+.logo {
+    color: #e6b800; /* Золотистый цвет */
+    font-size: 1.8em;
+    margin: 0;
+}
+
+nav a {
+    color: #f0f0f0;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #e6b800;
+}
+
+/* Секции */
 .section {
-    padding: 40px 20px;
-    margin: 20px 0;
-    border-bottom: 1px solid #444;
+    padding: 60px 50px;
+    text-align: center;
 }
 
-h2, h3 {
-    color: #ffcc00; /* Золотистый цвет */
+h2 {
+    color: #e6b800;
+    font-size: 2.5em;
+    margin-bottom: 40px;
 }
 
-/* Этого достаточно, чтобы увидеть, что стили применились */
+/* Ассортимент */
+.products-grid {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.product-card {
+    background-color: #444444;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    text-align: left;
+}
+
+.product-image {
+    background-color: #555;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    color: #ccc;
+    border-radius: 4px;
+}
+
+.product-name {
+    color: #e6b800;
+    font-size: 1.2em;
+    margin: 10px 0;
+}
+
+.product-price {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Элементы управления количеством */
+.quantity-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.quantity-control button {
+    background-color: #e6b800;
+    color: #1a1a1a;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.quantity-control button:hover {
+    background-color: #ffd700;
+}
+
+.qty-display {
+    font-size: 1.1em;
+    font-weight: bold;
+    padding: 0 15px;
+}
+
+/* Форма заказа */
+.order-form-container {
+    background-color: #444444;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: left;
+}
+
+.order-form-container label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #ccc;
+}
+
+.order-form-container input {
+    width: 95%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: #f0f0f0;
+}
+
+.submit-button {
+    background-color: #e6b800;
+    color: #1a1a1a;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    width: 100%;
+}
+
+.submit-button:disabled {
+    background-color: #777;
+    cursor: not-allowed;
+}
+
+.cart-summary {
+    background-color: #222222;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 0 auto 20px;
+    text-align: left;
+}
+
+.cart-total {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #e6b800;
+    margin-top: 15px;
+    border-top: 1px dashed #555;
+    padding-top: 10px;
+}
+
+/* Футер */
+footer {
+    background-color: #1a1a1a;
+    color: #888;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
