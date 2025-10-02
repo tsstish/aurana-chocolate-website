@@ -3,50 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Заказ оформлен!</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=11"> 
+    <title>Заказ оформлен | AURANA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=19">
     <style>
-        /* Стиль для центральной секции */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            text-align: center;
-            padding-top: 0;
-        }
         .success-box {
-            background-color: var(--color-dark-secondary);
+            background-color: #444;
             padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            max-width: 500px;
+            margin: 100px auto;
+            max-width: 600px;
+            border-radius: 8px;
+            text-align: center;
         }
-        .highlight {
-            color: var(--color-bronze);
+        .success-box h2 {
+            color: #e6b800;
+        }
+        .success-box p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #e6b800;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
             font-weight: bold;
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Перенаправляем на страницу личного кабинета через 2 секунды
-            setTimeout(() => {
-                window.location.href = "{{ url_for('profile') }}";
-            }, 2000); 
-        });
-    </script>
 </head>
 <body>
     <div class="success-box">
-        <h1>✅ Заказ оформлен!</h1>
-        <p>Спасибо за ваш заказ! Мы свяжемся с вами в ближайшее время. </p>
-        <p>Ваш код клиента: <span class="highlight">{{ code }}</span></p>
-        <p style="color: var(--color-text-dim);">
-            Сейчас вы будете автоматически перенаправлены в Личный кабинет...
-        </p>
-        <div style="margin-top: 30px;">
-            <a href="{{ url_for('profile') }}" class="cta-button">Перейти немедленно</a>
-        </div>
+        <h2>🎉 Заказ успешно оформлен!</h2>
+        <p>Наш менеджер свяжется с вами в ближайшее время для уточнения деталей.</p>
+        <p>Ваш код клиента: <strong>{{ code }}</strong>. Используйте его для входа в Личный кабинет.</p>
+        <a href="{{ url_for('profile') }}" class="cta-button">Перейти в Личный кабинет</a>
+        <a href="{{ url_for('index') }}" class="cta-button" style="margin-left: 10px;">На главную</a>
     </div>
 </body>
 </html>
