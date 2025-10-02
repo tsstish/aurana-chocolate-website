@@ -37,31 +37,6 @@ def index():
                            products=get_products())
 
 # МАРШРУТ: Оформление заказа (Просто устанавливает куки и перенаправляет)
-@app.route('/place_order', methods=['POST'])
-def place_order():
-    name = request.form.get('name', 'Клиент')
-    order_details_json = request.form.get('order_details_json') 
-    
-    # Здесь была бы отправка данных во внешний API (CRM, Google Sheets и т.д.)
-    # Сейчас мы просто генерируем код и перенаправляем.
-    
-    customer_code = request.cookies.get('customer_code')
-    if not customer_code:
-        customer_code = generate_new_code()
-    
-    # Логика: если заказ был, мы считаем его успешным
-    if order_details_json and json.loads(order_details_json):
-        # **ВНИМАНИЕ**: Здесь нет сохранения данных, только генерация кода и перенаправление.
-        print(f"Заказ от {name} (код: {customer_code}). Детали: {order_details_json}. Данные НЕ СОХРАНЕНЫ.")
-        
-        resp = make_response(redirect(url_for('order_success', code=customer_code)))
-        # Устанавливаем куки
-        resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60, httponly=True) 
-        
-        return resp
-
-    # Если заказ пустой или данные не пришли
-    return redirect(url_for('index'))
 
 
 # МАРШРУТ: Личный кабинет (Заглушка без истории)
@@ -88,10 +63,7 @@ def profile():
                            orders=mock_orders)
 
 
-@app.route('/order_success')
-def order_success():
-    code = request.args.get('code', 'AXXXXX')
-    return render_template('success.html', code=code)
+
 
 
 # QR-вход теперь просто устанавливает куки без проверки

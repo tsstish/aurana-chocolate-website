@@ -60,47 +60,23 @@
         </div>
     </section>
 
-    <section id="order" class="section">
-        <h2>Ваш Заказ</h2>
-        <div class="info-section" style="padding: 20px;">
-            <p class="highlight-info">Ваш код клиента: 
-                {% if customer_code %}
-                    <span class="highlight">{{ customer_code }}</span> 
-                {% else %}
-                    (Будет присвоен при первом заказе)
-                {% endif %}
-            </p>
-            <p class="greeting-info">
-                {% if name %}
-                    Здравствуйте, {{ name }}!
-                {% else %}
-                    Пожалуйста, заполните форму ниже.
-                {% endif %}
-            </p>
-
-            <ul id="cart-items">
-                <li id="cart-empty" style="text-align: center; color: var(--color-text-dim); border: none;">Ваша корзина пуста.</li>
-            </ul>
+<section id="order" class="section">
+    <div class="order-form-container" id="order-form-container">
+        <form id="order-form" action="https://formspree.io/f/xnngvdlb" method="POST">
+            <label for="name">Ваше Имя:</label>
+            <input type="text" id="name" name="Имя_Клиента" value="{{ name or '' }}" required>
             
-            <div id="cart-total" style="display: none; text-align: right; margin-top: 15px; font-size: 1.1em; font-weight: bold;">
-                Итого: <span>0</span> ₽
-            </div>
+            <label for="contact">Контакт (Email, Telegram или WhatsApp):</label>
+            <input type="text" id="contact" name="Контакт" placeholder="@telegram / email@example.com" required>
 
-            <div class="order-form-container" id="order-form-container">
-                <form id="order-form" action="{{ url_for('place_order') }}" method="POST">
-                    <label for="name">Ваше Имя:</label>
-                    <input type="text" id="name" name="name" value="{{ name or '' }}" required>
+            <input type="hidden" id="order_details_json" name="Детали_Заказа">
+            
+            <input type="hidden" name="Код_Клиента" value="{{ customer_code or 'Новый' }}">
 
-                    <label for="contact">Контакт (Email, Telegram или WhatsApp):</label>
-                    <input type="text" id="contact" name="contact" placeholder="@telegram / email@example.com" required>
-
-                    <input type="hidden" id="order_details_json" name="order_details_json">
-
-                    <button type="submit" class="submit-button" id="submit-order" disabled>Оформить заказ</button>
-                </form>
-            </div>
-        </div>
-    </section>
+            <button type="submit" class="submit-button" id="submit-order" disabled>Оформить заказ</button>
+        </form>
+    </div>
+</section>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
