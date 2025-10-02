@@ -3,118 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет - Aurana</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=9"> 
-    <style>
-        /* Стиль для контейнера Личного кабинета */
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: var(--color-dark-secondary);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        
-        .highlight {
-            color: var(--color-bronze);
-            font-weight: bold;
-        }
-
-        .order-history {
-            margin-top: 30px;
-        }
-
-        .order-card {
-            border: 1px solid var(--color-border);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            background-color: var(--color-dark-primary);
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-            color: var(--color-gold-light);
-        }
-        
-        .order-header span {
-            color: var(--color-text-light);
-        }
-
-        .order-status {
-            color: var(--color-bronze);
-            font-weight: bold;
-        }
-
-        .order-details ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .order-details li {
-            border-bottom: 1px dashed var(--color-border);
-            padding: 5px 0;
-            display: flex;
-            justify-content: space-between;
-            color: var(--color-text-dim);
-        }
-        
-        @media (max-width: 600px) {
-             .container {
-                margin: 20px;
-                padding: 15px;
-            }
-        }
-    </style>
+    <title>Личный кабинет | AURANA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=15">
 </head>
-
 <body>
-    <header class="header">
-        <a href="{{ url_for('index') }}" class="logo">AURANA</a>
-        <nav>
-            <a href="{{ url_for('index') }}#catalog">На сайт</a>
-        </nav>
+    <header class="main-header">
+        <div class="header-content">
+            <h1 class="logo"><a href="{{ url_for('index') }}">AURANA</a></h1>
+            <nav>
+                <a href="{{ url_for('index') }}">На главную</a>
+            </nav>
+        </div>
     </header>
 
-    <div class="container">
-        <h1>Личный Кабинет</h1>
-        <p style="text-align: center; margin-bottom: 40px;">
-            Ваш код клиента: <span class="highlight">{{ code }}</span>.
-            Мы рады, что вы с нами с <span class="highlight">{{ registration_date }}</span>. 
-            Всего заказов: <span class="highlight">{{ orders | length }}</span>.
-        </p>
+    <main class="profile-main">
+        <section class="section profile-section">
+            <h2>Личный кабинет</h2>
 
-        <div class="order-history">
-            <h2>История заказов</h2>
+            <div class="client-info">
+                <p>Ваше имя: <strong>{{ customer_name }}</strong></p>
+                <p>Ваш уникальный код: <strong>{{ code }}</strong></p>
+                <p>Дата регистрации: {{ registration_date }}</p>
+            </div>
+
+            <h3>История заказов (Заглушка)</h3>
             
             {% if orders %}
-                {% for order in orders %}
-                <div class="order-card">
-                    <div class="order-header">
-                        <span>Заказ #{{ loop.index }} (от {{ order.order_date }})</span>
-                        <span class="order-status">Статус: {{ order.status }}</span>
-                    </div>
-                    <div class="order-details">
-                        <ul>
-                            {% for item in order.items %}
-                                <li>
-                                    <span>{{ item.name }}</span>
-                                    <span>{{ item.qty }} шт. x {{ item.price }} ₽</span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+                <div class="orders-list">
+                    {% for order in orders %}
+                        <div class="order-card">
+                            <p><strong>Дата заказа:</strong> {{ order.order_date }}</p>
+                            <p><strong>Статус:</strong> {{ order.status }}</p>
+                            <div class="order-items">
+                                <h4>Детали:</h4>
+                                {% for item in order.items %}
+                                    <p>{{ item.name }} ({{ item.qty }} шт.) - {{ item.price | int }} ₽</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                <p class="warning-text">Внимание: История заказов не сохраняется на этом хостинге и показана как пример.</p>
             {% else %}
-                <p style="text-align: center; color: var(--color-text-dim);">У вас пока нет оформленных заказов.</p>
+                <p>У вас пока нет оформленных заказов.</p>
             {% endif %}
 
-        </div>
-    </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AURANA. Все права защищены.</p>
+    </footer>
 </body>
 </html>
