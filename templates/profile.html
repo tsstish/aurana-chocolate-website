@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет | AURANA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=17">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=20">
 </head>
 <body>
     <header class="main-header">
@@ -18,7 +18,7 @@
 
     <main class="profile-main">
         <section class="section profile-section">
-            <h2>Личный кабинет</h2>
+            <h2>Личный кабинет (Режим Заглушки)</h2>
 
             <div class="client-info">
                 <p>Ваше имя: <strong>{{ customer_name }}</strong></p>
@@ -26,27 +26,27 @@
                 <p>Дата регистрации: {{ registration_date }}</p>
             </div>
 
-            <h3>История заказов</h3>
+            <h3>История заказов (Заглушка)</h3>
             
-            {% if orders %}
-                <div class="orders-list">
-                    {% for order in orders %}
-                        <div class="order-card">
-                            <p><strong>Дата заказа:</strong> {{ order.order_date }}</p>
-                            <p><strong>Статус:</strong> {{ order.status }}</p>
-                            <div class="order-items">
-                                <h4>Детали:</h4>
-                                {% for item in order.items %}
-                                    <p>{{ item.name }} ({{ item.qty }} шт.) - {{ item.price | int }} ₽</p>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>У вас пока нет оформленных заказов.</p>
-            {% endif %}
+            <p style="color: red; font-weight: bold;">
+                История заказов не сохраняется и отображается как пример из-за ограничений хостинга.
+            </p>
 
+            <div class="orders-list">
+                {% for order in orders %}
+                    <div class="order-card" style="border: 1px solid #555; margin-top: 15px; padding: 15px; text-align: left;">
+                        <p><strong>Дата заказа:</strong> {{ order.order_date }}</p>
+                        <p><strong>Статус:</strong> {{ order.status }}</p>
+                        <div class="order-items">
+                            <h4>Детали:</h4>
+                            {% for item in order.items %}
+                                <p>{{ item.name }} ({{ item.qty }} шт.) - {{ item.price | int }} ₽</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
         </section>
     </main>
 
