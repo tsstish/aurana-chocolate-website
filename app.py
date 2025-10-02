@@ -36,27 +36,29 @@ def index():
                            is_registered=is_registered,
                            products=get_products())
 
-# МАРШРУТ: Личный кабинет (Заглушка без истории)
+# МАРШРУТ: Личный кабинет (Теперь максимально простая заглушка)
 @app.route('/profile')
 def profile():
     customer_code = request.cookies.get('customer_code')
     
+    # Если куки нет, мы генерируем новый код (но не сохраняем)
     if not customer_code:
-        return redirect(url_for('index'))
-
+        # Генерируем новый код для отображения, но не сохраняем его в куки сейчас
+        customer_code = generate_new_code() 
+    
     # Данные для шаблона - статические заглушки
     mock_orders = [
         {
             'order_date': datetime.now().strftime('%d.%m.%Y %H:%M'),
-            'status': 'Новый (не сохранен)',
-            'items': [{"name": "Образец: Шоколад с клубникой", "qty": 1, "price": 1500}]
+            'status': 'Образец (данные не сохранены)',
+            'items': [{"name": "Шоколад с клубникой", "qty": 1, "price": 1500}]
         },
     ]
 
     return render_template('profile.html',
                            code=customer_code,
-                           customer_name="Клиент",
-                           registration_date="сегодня",
+                           customer_name="Новый Клиент" if customer_code.startswith('A') else "Ваш Клиент",
+                           registration_date="Нет данных о регистрации",
                            orders=mock_orders)
 
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AURANA | Крафтовый Шоколад</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=13"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=14"> 
 </head>
 <body>
 
@@ -37,7 +37,7 @@
                 <div class="product-card" data-id="{{ product.id }}" data-name="{{ product.name }}" data-price="{{ product.price }}">
                     
                     <div class="product-image">
-                        <p>ИЗОБРАЖЕНИЕ</p>
+                        <p>ИЗОБРАЖЕНИЕ</p> 
                     </div>
 
                     <h3 class="product-name">{{ product.name }}</h3>
@@ -80,7 +80,7 @@
             </div>
 
             <div class="order-form-container" id="order-form-container">
-                <form id="order-form" action="https://formspree.io/f/xnngvdlb" method="POST"> 
+                <form id="order-form" action="https://formspree.io/f/xyzaaaaa" method="POST"> 
                     
                     {% if customer_code %}
                     <p class="client-code-display">Ваш код клиента: <strong>{{ customer_code }}</strong></p>
@@ -109,7 +109,7 @@
         <p>&copy; 2025 AURANA. Все права защищены.</p>
     </footer>
 
-    <script src="{{ url_for('static', filename='app.js') }}?v=13"></script>
+    <script src="{{ url_for('static', filename='app.js') }}?v=14"></script>
 
 </body>
 </html>
