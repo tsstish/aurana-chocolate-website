@@ -5,7 +5,7 @@ import json
 
 app = Flask(__name__)
 
-# Максимально упрощенные функции (нет БД, нет файлов)
+# --- Вспомогательные функции ---
 
 def get_products():
     return [
@@ -15,18 +15,16 @@ def get_products():
     ]
 
 def generate_new_code():
-    """Просто генерирует новый код."""
+    """Просто генерирует новый код клиента."""
     return f"A{random.randint(1000, 9999):04d}"
 
-# =========================================================================
-# МАРШРУТЫ
-# =========================================================================
+# --- Маршруты ---
 
 @app.route('/')
 def index():
     customer_code = request.cookies.get('customer_code')
     
-    # Имя и статус регистрации теперь просто заглушки, т.к. данные не хранятся
+    # Имя и статус регистрации теперь просто заглушки
     name = "Клиент" if customer_code else None
     is_registered = bool(customer_code)
 
@@ -36,14 +34,13 @@ def index():
                            is_registered=is_registered,
                            products=get_products())
 
-# МАРШРУТ: Личный кабинет (Теперь максимально простая заглушка)
+# МАРШРУТ: Личный кабинет (Защищен от ошибок куки)
 @app.route('/profile')
 def profile():
     customer_code = request.cookies.get('customer_code')
     
-    # Если куки нет, мы генерируем новый код (но не сохраняем)
+    # Защита: Если куки нет, генерируем код для отображения
     if not customer_code:
-        # Генерируем новый код для отображения, но не сохраняем его в куки сейчас
         customer_code = generate_new_code() 
     
     # Данные для шаблона - статические заглушки
@@ -57,15 +54,16 @@ def profile():
 
     return render_template('profile.html',
                            code=customer_code,
-                           customer_name="Новый Клиент" if customer_code.startswith('A') else "Ваш Клиент",
+                           customer_name="Ваш Клиент",
                            registration_date="Нет данных о регистрации",
                            orders=mock_orders)
 
 
-# QR-вход теперь просто устанавливает куки без проверки
+# QR-вход (Устанавливает куки и перенаправляет на главную)
 @app.route('/qr/<customer_code>')
 def qr_entry(customer_code):
     resp = make_response(redirect(url_for('index')))
+    # Устанавливаем куки на 30 дней
     resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
     return resp
 

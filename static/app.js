@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Инициализация состояния корзины
     const cart = {};
     const productElements = document.querySelectorAll('.product-card');
     const cartItemsElement = document.getElementById('cart-items');
@@ -9,14 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const formHint = document.getElementById('form-hint');
 
     /**
-     * 2. Обновляет отображение корзины и поля JSON
+     * Обновляет отображение корзины и поля JSON
      */
     function updateCartDisplay() {
         let total = 0;
         let hasItems = false;
         cartItemsElement.innerHTML = '';
 
-        const cartDetails = []; // Массив для JSON-данных
+        const cartDetails = []; 
 
         for (const id in cart) {
             const item = cart[id];
@@ -45,23 +44,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Если корзина пуста
+        // Управление видимостью кнопки и подсказки
         if (!hasItems) {
             cartItemsElement.innerHTML = '<p>Корзина пуста. Добавьте товар, чтобы оформить заказ.</p>';
             orderDetailsJsonInput.value = '';
             submitButton.disabled = true;
             formHint.style.display = 'block';
         } else {
-            // Если в корзине есть товары
             cartTotalDisplay.textContent = total.toLocaleString();
-            orderDetailsJsonInput.value = JSON.stringify(cartDetails, null, 2);
+            // Преобразуем JSON в строку для отправки
+            orderDetailsJsonInput.value = JSON.stringify(cartDetails, null, 2); 
             submitButton.disabled = false;
             formHint.style.display = 'none';
         }
     }
 
     /**
-     * 3. Инициализация корзины из данных на странице
+     * Инициализация корзины из данных на странице
      */
     productElements.forEach(card => {
         const id = card.dataset.id;
@@ -77,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /**
-     * 4. Обработчик нажатия на кнопки +/-
+     * Обработчик нажатия на кнопки +/-
      */
     document.body.addEventListener('click', (e) => {
         if (e.target.classList.contains('qty-plus') || e.target.classList.contains('qty-minus')) {
@@ -91,10 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     cart[id].qty -= 1;
                 }
                 
-                // Обновляем число на карточке
                 document.getElementById(`qty-${id}`).textContent = cart[id].qty;
 
-                // Обновляем корзину
                 updateCartDisplay();
             }
         }
