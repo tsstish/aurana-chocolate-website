@@ -4,55 +4,50 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет | AURANA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=15">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=16">
 </head>
 <body>
-    <header class="main-header">
-        <div class="header-content">
-            <h1 class="logo"><a href="{{ url_for('index') }}">AURANA</a></h1>
-            <nav>
-                <a href="{{ url_for('index') }}">На главную</a>
-            </nav>
-        </div>
+    <header>
+        <nav>
+            <a href="{{ url_for('index') }}">На главную</a>
+        </nav>
     </header>
 
-    <main class="profile-main">
-        <section class="section profile-section">
-            <h2>Личный кабинет</h2>
+    <main style="padding: 20px;">
+        <h2>Личный кабинет</h2>
 
-            <div class="client-info">
-                <p>Ваше имя: <strong>{{ customer_name }}</strong></p>
-                <p>Ваш уникальный код: <strong>{{ code }}</strong></p>
-                <p>Дата регистрации: {{ registration_date }}</p>
+        <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px;">
+            <h3>Ваша информация</h3>
+            <p>Ваш уникальный код: <strong>{{ code }}</strong></p>
+            <p>Имя: {{ customer_name }}</p>
+            <p>Регистрация: {{ registration_date }}</p>
+        </div>
+
+        <h3>История заказов (Заглушка)</h3>
+        
+        {% if orders %}
+            <div class="orders-list">
+                {% for order in orders %}
+                    <div style="border: 1px solid #eee; margin-top: 10px; padding: 10px;">
+                        <p><strong>Дата заказа:</strong> {{ order.order_date }}</p>
+                        <p><strong>Статус:</strong> {{ order.status }}</p>
+                        <p>Детали:
+                            {% for item in order.items %}
+                                {{ item.name }} ({{ item.qty }} шт.) |
+                            {% endfor %}
+                        </p>
+                    </div>
+                {% endfor %}
             </div>
+            <p style="color: red;">Внимание: История заказов не сохраняется на этом хостинге и показана как пример.</p>
+        {% else %}
+            <p>У вас пока нет оформленных заказов.</p>
+        {% endif %}
 
-            <h3>История заказов (Заглушка)</h3>
-            
-            {% if orders %}
-                <div class="orders-list">
-                    {% for order in orders %}
-                        <div class="order-card">
-                            <p><strong>Дата заказа:</strong> {{ order.order_date }}</p>
-                            <p><strong>Статус:</strong> {{ order.status }}</p>
-                            <div class="order-items">
-                                <h4>Детали:</h4>
-                                {% for item in order.items %}
-                                    <p>{{ item.name }} ({{ item.qty }} шт.) - {{ item.price | int }} ₽</p>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-                <p class="warning-text">Внимание: История заказов не сохраняется на этом хостинге и показана как пример.</p>
-            {% else %}
-                <p>У вас пока нет оформленных заказов.</p>
-            {% endif %}
-
-        </section>
     </main>
 
     <footer>
-        <p>&copy; 2025 AURANA. Все права защищены.</p>
+        <p>&copy; 2025 AURANA.</p>
     </footer>
 </body>
 </html>
