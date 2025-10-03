@@ -14,81 +14,30 @@ def get_products():
     ]
 
 def generate_new_code():
-    """Генерирует код, но он не будет использоваться для сохранения истории."""
     return f"A{random.randint(1000, 9999):04d}"
 
 # --- Маршруты ---
 
 @app.route('/')
 def index():
-    customer_code = request.cookies.get('customer_code')
-    
-    # Всегда генерируем код, если его нет (для отображения в форме)
-    if not customer_code:
-        customer_code = generate_new_code()
+    # Куки больше не используем. Код генерируем для отображения в форме.
+    customer_code = generate_new_code()
     
     return render_template('index.html', 
                            customer_code=customer_code,
                            products=get_products())
 
-# МАРШРУТ: Оформление заказа (Просто устанавливает куки и перенаправляет)
-@app.route('/place_order', methods=['POST'])
-def place_order():
-    # Мы могли бы здесь отправить данные в Formspree, но пока просто перенаправим
-    
-    customer_code = request.cookies.get('customer_code')
-    is_new_customer = False
-
-    if not customer_code:
-        customer_code = generate_new_code()
-        is_new_customer = True
-
-    # Перенаправление на страницу успеха
-    resp = make_response(redirect(url_for('order_success', code=customer_code)))
-    
-    if is_new_customer:
-        # Устанавливаем куки
-        resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
-    
-    return resp
-
-
-@app.route('/order_success')
-def order_success():
-    code = request.args.get('code', 'AXXXXX')
-    return render_template('success.html', code=code)
-
-
-# МАРШРУТ: Личный кабинет (Полностью статичная заглушка)
+# МАРШРУТ: Личный кабинет (БЕЗОПАСНАЯ ВЕРСИЯ)
 @app.route('/profile')
 def profile():
-    customer_code = request.cookies.get('customer_code')
-    
-    if not customer_code:
-        customer_code = "Не зарегистрирован" # Для отображения
-
-    # Статические данные для отображения
-    mock_orders = [
-        {
-            'order_date': datetime.now().strftime('%d.%m.%Y %H:%M'),
-            'status': 'Пример (нет данных)',
-            'items': [{"name": "Шоколад с клубникой", "qty": 1, "price": 1500}]
-        },
-    ]
-
-    return render_template('profile.html',
-                           code=customer_code,
-                           customer_name="Ваш Клиент",
-                           registration_date="Нет данных", 
-                           orders=mock_orders)
+    # НЕ ПЕРЕДАЕМ НИ ОДНОЙ ПЕРЕМЕННОЙ
+    return render_template('profile.html')
 
 
-# QR-вход (Устанавливает куки)
+# QR-вход (Просто перенаправляет)
 @app.route('/qr/<customer_code>')
 def qr_entry(customer_code):
-    resp = make_response(redirect(url_for('index')))
-    resp.set_cookie('customer_code', customer_code, max_age=30*24*60*60) 
-    return resp
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':

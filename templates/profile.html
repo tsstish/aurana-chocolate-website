@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет | AURANA</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=20">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=22">
 </head>
 <body>
     <header class="main-header">
@@ -18,33 +18,30 @@
 
     <main class="profile-main">
         <section class="section profile-section">
-            <h2>Личный кабинет (Режим Заглушки)</h2>
+            <h2>Личный кабинет (Статический режим)</h2>
 
-            <div class="client-info">
-                <p>Ваше имя: <strong>{{ customer_name }}</strong></p>
-                <p>Ваш уникальный код: <strong>{{ code }}</strong></p>
-                <p>Дата регистрации: {{ registration_date }}</p>
-            </div>
-
-            <h3>История заказов (Заглушка)</h3>
-            
-            <p style="color: red; font-weight: bold;">
-                История заказов не сохраняется и отображается как пример из-за ограничений хостинга.
+            <p style="color: red; font-weight: bold; font-size: 1.1em; margin-bottom: 30px;">
+                Внимание! Функционал временно отключен из-за ограничений хостинга.
+                Менеджер вручную внесет Ваш код и историю заказов после подтверждения.
             </p>
 
+            <div class="client-info" style="border: 1px solid #555; padding: 20px; text-align: left; margin-bottom: 30px;">
+                <p>Ваше имя: <strong>[Внесет Менеджер]</strong></p>
+                <p>Ваш уникальный код: <strong>[AXXXXX]</strong></p>
+            </div>
+
+            <h3>История заказов (Пример)</h3>
+            
             <div class="orders-list">
-                {% for order in orders %}
-                    <div class="order-card" style="border: 1px solid #555; margin-top: 15px; padding: 15px; text-align: left;">
-                        <p><strong>Дата заказа:</strong> {{ order.order_date }}</p>
-                        <p><strong>Статус:</strong> {{ order.status }}</p>
-                        <div class="order-items">
-                            <h4>Детали:</h4>
-                            {% for item in order.items %}
-                                <p>{{ item.name }} ({{ item.qty }} шт.) - {{ item.price | int }} ₽</p>
-                            {% endfor %}
-                        </div>
+                <div class="order-card" style="border: 1px solid #555; margin-top: 15px; padding: 15px; text-align: left;">
+                    <p><strong>Дата заказа:</strong> 15.10.2025 10:30</p>
+                    <p><strong>Статус:</strong> Ожидает оплаты</p>
+                    <div class="order-items">
+                        <h4>Детали:</h4>
+                        <p>Плитка молочного шоколада с клубникой (1 шт.) - 1500 ₽</p>
+                        <p>Плитка молочного шоколада с манго (2 шт.) - 3000 ₽</p>
                     </div>
-                {% endfor %}
+                </div>
             </div>
             
         </section>
